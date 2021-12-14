@@ -127,8 +127,8 @@ void missile1(int pipeout){
 			clear();
 			mvaddch(oggetto.y, oggetto.x, oggetto.c);
 			curs_set(0);
-			refresh();
-		default: endwin(); exit()
+			refresh(); break;
+		default: endwin(); exit(0);
 		}
 		}
 	}
