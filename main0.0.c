@@ -21,6 +21,7 @@ struct posizione{
 //Si implementa il movimento principale dell'astronave '+' del giocatore
 int main()
 {
+	//inizializzazione delle varie parti
 	int p[2];
 	int status;
 	initscr();
