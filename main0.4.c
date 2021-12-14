@@ -104,7 +104,7 @@ void astro(int pipeout)
 
 
 
-
+ 
 void missile1(int pipeout){
 	struct posizione oggetto;
 	oggetto.y= MAXY/2;
