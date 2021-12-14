@@ -110,7 +110,7 @@ void missile1(int pipeout){
 	oggetto.y= MAXY/2;
 	int dimsprite=sizeof(sprite);
 	oggetto.x=dimsprite + dimsprite/4;
-	oggetto.c='°'
+	oggetto.c=''+';
 	
 	write(pipeout,&oggetto,sizeof(oggetto));
 	
