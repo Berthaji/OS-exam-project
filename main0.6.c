@@ -96,7 +96,7 @@ pipe(p);				/* Creazione pipe */
 
 /*
 ----------------------------------------------------------------------
- Funzione 'Vespa'
+ Funzione Missile
 ---------------------------------------------------------------------- 
 */
 void Missile(int pipeout, int x, int y, type_m tipo)
