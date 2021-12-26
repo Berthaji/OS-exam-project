@@ -105,9 +105,9 @@ void pMissile(int pipeOut, int direction, object o)
 void pEngine()
 {
     object astroship;
-    object *enemies = (object *)malloc(sizeof(object) * 0);
-    object *bombs = (object *)malloc(sizeof(object) * 0);
-    object *missiles = (object *)malloc(sizeof(object) * 0);
+    object *enemies = (object *)malloc(sizeof(object) * M);
+    object *bombs = NULL;
+    object *missiles = NULL;
 
     //contatori
     int enemiesCount = M;
@@ -117,7 +117,7 @@ void pEngine()
     bool loop = true; //controlla l'esecuzione del while principale
 
     //variabili di supporto
-    //int i = 0;
+    int i = 0;
     object message; //qui viene salvato il messaggio letto dalla pipe dei processi
    
     /**
@@ -142,6 +142,8 @@ void pEngine()
     astroship.type = ASTROSHIP;
     astroship.hasShot = false;
     astroship.appearance = rand() % ASTRODCHOICE;
+    astroship.state = INITIALIZED;
+    
     //starship.color = rand()%7;
 
 
@@ -157,9 +159,8 @@ void pEngine()
         pAstroship(fs[1], astroship);
     else
     {
-       
-        enemies = (object *)realloc(enemies, sizeof(object) * enemiesCount);
-        for (int i = 0, x = 0, y = 1; i < M, x < 4; i++)
+      
+        for (int i = 0, x = 0, y = 1; i < enemiesCount && x < 4; i++)
         {
             enemies[i].x = SCREEN_W / 2 + 1 + (x * 5);
             enemies[i].y = 7 * y;
@@ -167,12 +168,13 @@ void pEngine()
             enemies[i].state = INITIALIZED;
             enemies[i].appearance = 0;
             enemies[i].id = i;
-            enemies[i].pid = fork();
+           
             if (i % 4 == 3)
             {
                 y = 1;
                 x++;
             }
+             enemies[i].pid = fork();
             if (enemies[i].pid == 0)
             {
                 pEnemy(pipeOut, enemies[i]);
@@ -198,14 +200,17 @@ void pEngine()
             if (message.hasShot)
             {
                 missilesCount += 2;
-                missiles = (object *)realloc(missiles, sizeof(object) * missilesCount);
+                if(missiles == NULL)
+                    missiles = (object *)malloc(sizeof(object) * missilesCount);
+                else
+                    missiles = (object *)realloc(missiles, sizeof(object) * missilesCount);
+
                 for (int i = missilesCount - 2; i < missilesCount; i++)
                 {
-                    missiles[i].x = message.x + 5; //Initial coordinates must be derivated form the astroship process
+                    missiles[i].x = message.x + 5; 
                     missiles[i].y = message.y + 2;
                     missiles[i].type = MISSILE;
                     missiles[i].state = INITIALIZED;
-                    missiles[i].appearance = -1;
                     missiles[i].id = i;
                     missiles[i].pid = fork();
                     if (missiles[i].pid == 0)
