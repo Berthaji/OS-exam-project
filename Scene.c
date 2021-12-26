@@ -1,125 +1,152 @@
 
 #include "Scene.h"
 
-char astroship_sprites[ASTRODCHOICE][5][6]={ //ben 4 scelte possibili
-    //Astronave 1
+char astroship_sprites[ASTRODCHOICE][5][6] = { //4 possibile choices
+    //Astroship 1
     {
         {"-    "},
         {" --> "},
         {"<!>--"},
         {" --> "},
-        {"-    "} 
-    },
-    //Astronave 2
+        {"-    "}},
+    //Astroship 2
     {
         {"<=-  "},
         {" --- "},
         {" oooo"},
         {" --- "},
-        {"<=-  "}  
-    },
-    //Astronave 3
+        {"<=-  "}},
+    //Astroship 3
     {
         {"]    "},
         {" ||  "},
         {"<>==="},
         {" ||  "},
-        {"]    "}  
-    },
-    //Astronave 4
+        {"]    "}},
+    //Astroship 4
     {
-        {"  +++"},
+        {"  ==>"},
         {"<-   "},
         {"  ->>"},
         {"<-   "},
-        {"  +++"}  
-    }
-    
+        {"  ==>"}}
+
 };
 
-
-char enemy_sprites[ENEMYDCHOICE][3][4]={
-    //Nemico 1
+char enemy_sprites[ENEMYDCHOICE][3][4] = {
+    //Enemy 1
     {
         {" --"},
         {"<=="},
-        {" --"}
-    },
+        {" --"}},
 
-    //Nemico 2
+    //Enemy 2
     {
         {"   "},
         {"<=="},
-        {"   "}
-    },
+        {"   "}},
 
-    //Nemico 3
+    //Enemy 3
     {
         {"<= "},
         {"oo-"},
-        {"<= "}
-    },
-    //Nemico 4 -> Nemico di secondo livello?
+        {"<= "}},
+    //Enemy 4 
     {
         {"X X"},
         {"   "},
-        {"X X"}
-    }
-};
+        {"X X"}}};
 
-
-
+/**
+ * @brief Replaces every character on the screen with a whitespace
+ * 
+ */
 void clearScreen()
 {
     for (int y = 0; y < SCREEN_H; y++)
         for (int x = 0; x < SCREEN_W; x++)
             mvaddch(y, x, ' ');
 }
-void initScreen(){
+
+/**
+ * @brief Initialize display settings 
+ * 
+ */
+void initScreen()
+{
 
     initscr();
     noecho();
-    keypad(stdscr, 1); //Attenzione lavoriamo sullo schermo principale
+    keypad(stdscr, 1);
     curs_set(0);
-    start_color(); //Per la gestione dei colori
+    start_color();
 
     init_pair(1, COLOR_RED, COLOR_BLACK);   /* Colore oggetto */
     init_pair(2, COLOR_BLACK, COLOR_BLACK); /* Colore per cancellare */
     init_pair(3, COLOR_GREEN, COLOR_BLACK); /* Colore per cancellare */
 }
 
-void drawScene(){
+/**
+ * @brief Drawing objects in the scene
+ * 
+ */
+void drawScene(
+    object astroship,
+    object *enemies, int enemiesCount,
+    object *missiles, int missilesCount,
+    object *bombs, int bombsCount)
+{
     clearScreen();
-    object starship;
-    //Inizializziamo inanzitutto l'astronave, che passeremo di continuo
-    starship.k_type = NOT_INIZIALIZED; //Ridondante ma necessario (? evitiamo controlli di deffault sbagliati?)
-    starship.x = 0;
-    starship.y = 0;
-    starship.o_type = ASTRONAVE;
-    //starship->pid = getpid();
-    starship.dtype = rand() % ASTRODCHOICE;
-    starship.color = rand() % 7;
+    drawObject(astroship);
 
-    //Ultimo comando prima di far partire il resto
-    starship.k_type = INIZIALIZED;
+    int i;
+    for (i = 0; i < enemiesCount; i++)
+        drawObject(enemies[i]);
 
-    drawObject(starship);
+    for (i = 0; i < bombsCount; i++)
+        drawObject(bombs[i]);
+
+    for (i = 0; i < missilesCount; i++)
+        drawObject(missiles[i]);
+    refresh();
 }
+
+/**
+ * @brief Drawing the single object 
+ * 
+ * @param entity Object to draw
+ */
 void drawObject(object entity)
 {
-    int i = 1;
+    switch (entity.type){
+        case ASTROSHIP:{
+            for (int j = 0; j < ASTRODIM; j++)
+                mvprintw(entity.y + j, entity.x, astroship_sprites[entity.appearance][j]);
+            break;
+        }
 
-    switch (entity.o_type)
-    {
-    case ASTRONAVE:
-        i = ASTRODIM;
-        break;
-    case NEMICO1:
-    case NEMICO2:
-        i = ENEMYDIM;
-        break;
+        case ENEMY1:{
+
+            for (int j = 0; j < ENEMYDIM; j++)
+                mvprintw(entity.y + j, entity.x, enemy_sprites[entity.appearance][j]);
+            break;
+        }
+        
+        case ENEMY2:{
+
+            for (int j = 0; j < ENEMYDIM; j++)
+                mvprintw(entity.y + j, entity.x, enemy_sprites[entity.appearance][3]);
+            break;
+        }
+
+        case MISSILE:
+            mvprintw(entity.y, entity.x, "#");
+            break;
+
+        case BOMB:
+            mvprintw(entity.y, entity.x, "O");
+            break;
+
     }
 
-    for (int j = 0; j < i; j++)
-        mvprintw(entity.y + j, entity.x, astroship_sprites[entity.dtype][j]);
 }
