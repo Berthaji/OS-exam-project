@@ -25,11 +25,11 @@ char astroship_sprites[ASTRODCHOICE][5][6] = { //4 possibile choices
         {"]    "}},
     //Astroship 4
     {
-        {"  ==>"},
-        {"<-   "},
-        {"  ->>"},
-        {"<-   "},
-        {"  ==>"}}
+        {"==>  "},
+        {" ==> "},
+        {"  ]=="},
+        {" ==> "},
+        {"==>  "}}
 
 };
 
@@ -83,14 +83,13 @@ void initScreen()
     start_color();
 
     init_pair(1, COLOR_RED, COLOR_BLACK);     /* Colore oggetto */
-    init_pair(2, COLOR_BLACK, COLOR_BLACK);   /* Colore per cancellare */
+    init_pair(2, COLOR_WHITE, COLOR_BLACK);   /* Colore per cancellare */
     init_pair(3, COLOR_GREEN, COLOR_BLACK);   /* Colore per cancellare */
     init_pair(4, COLOR_BLUE, COLOR_BLACK);    /* Colore per cancellare */
     init_pair(5, COLOR_CYAN, COLOR_BLACK);    /* Colore per cancellare */
     init_pair(6, COLOR_MAGENTA, COLOR_BLACK); /* Colore per cancellare */
     init_pair(7, COLOR_RED, COLOR_BLACK);     /* Colore per cancellare */
     init_pair(8, COLOR_YELLOW, COLOR_BLACK);  /* Colore per cancellare */
-    init_pair(9, COLOR_WHITE, COLOR_BLACK);   /* Colore per cancellare */
 
   //  attron(COLOR_PAIR(8));
 }

@@ -23,7 +23,11 @@ int main(){
     initScreen();
     
     //motore di gioco basato su processi
-    pEngine(LIFES);  
+    pEngine(LIFES);
+
+    // int i = LIFES; 
+    // while(i > 0)
+    //     pEngine(--i); 
 
     //ripristino della finestra del terminale
     endwin();

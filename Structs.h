@@ -5,7 +5,7 @@
 typedef enum TYPE {ASTROSHIP, ENEMY1, ENEMY2, BOMB, MISSILE} TYPE;
 
 //Stato dell'oggetto
-typedef enum {NOT_INITIALIZED, INITIALIZED, ALIVE, DEAD} STATE; //$$ Bisognerebbe togliere i primi due parametri ormai inutili
+typedef enum {NOT_INITIALIZED, INITIALIZED, ALIVE, DEAD, KILLED} STATE; //$$ Bisognerebbe togliere i primi due parametri ormai inutili
 
 typedef struct Point{
     int x;

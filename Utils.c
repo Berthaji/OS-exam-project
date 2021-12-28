@@ -37,7 +37,8 @@ int MissileCollided(object* enemy, object missiles, int enemiesCount){
 
 int AstroCollided(object astroship, object dangerousObj){
     int i = 1;
-    if( dangerousObj.x - astroship.x == 5 &&  dangerousObj.y - astroship.y < 5)
+    if( dangerousObj.x - astroship.x == 5 &&  
+            dangerousObj.y - astroship.y < 5 && dangerousObj.y - astroship.y >= 0)
         // range(astroship.x, astroship.x , dangerousObj.x) &&
         // range(astroship.y, astroship.y +5 , dangerousObj.y))
         {
