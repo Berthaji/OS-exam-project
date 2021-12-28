@@ -11,11 +11,10 @@
 #define MAXY		20		/* Dimensione dello schermo di output (righe)   */
 #define DELAY 	90000	/* Ritardo nel movimento delle vespe (da adattare) */
 
-typedef enum{ GOES_UP, GOES_DOWN} type_m;
 
 /* Prototipi funzioni adoperate */
 void Astronave(int pipeout, int pipein);
-void Missile(int pipeout, int x, int y, type_m tipo);
+void Missile(int pipeout, int x, int y);
 void Nemico(int pipeout);
 void Area(int pipein);
 
@@ -28,7 +27,7 @@ char sprite[5][5]={
 	
 char spriteLine[5]={"|_|> "};
 char blankSprite[5]={"     "};
-char spriteEnemy[5]={"|()| "};
+
 
 
 /* Struttura adoperata per veicolare le coordinate */
@@ -50,7 +49,6 @@ int p[2];				/* Descrittori pipe */
 int pidA;   		/* Pid processo figlio Astronave*/
 int pidN;		/* Pid al processo figlio Nemico*/
 int i, status;	      
-int starty=MAXY/2;
 
 initscr();			/* Inizializza schermo di output */
 noecho();				/* Imposta modalità della tastiera */
@@ -66,36 +64,36 @@ pipe(p);				/* Creazione pipe */
   
 		
 		if(pidA==0) {
-				for(i=0; i<5; i++){
+				/*for(i=0; i<5; i++){
 					mvprintw(starty,0,(char*)spriteLine);
-					starty -= 1;}
+					starty -= 1;}*/
 					
 				
     				Astronave(p[1], p[0]); 
   }		
-  else {		
+  if(getpid()!=0) {		
 		pidN=fork();
 		
   			if(pidN==0){
-  				mvprintw(MAXY/2,MAXX/2+1,(char*)spriteEnemy);
+  				mvaddch(MAXY/2,MAXX/2+1,'n');
+  				printf("okkk");
   				close(p[0]);
   				Nemico(p[1]);
   				}
 			else{
-  				
+  				waitpid(pidN, &status);
 				close(p[1]); /* chiusura del descrittore di scrittura */
 			    	Area(p[0]);  /* invocazione funzione area */  
 		    	    }
      		
 		}
-
+		
+		
 		/* Termino i processi Vespa e Contadino */
   	kill(pidA,1);	
   	kill(pidN,1); 
      		
-
-		
-  	kill(pidA,1);	
+	
   	//kill(pidN,1);	
 
 		/* Ripristino la modalità di funzionamento usuale */
@@ -114,7 +112,7 @@ pipe(p);				/* Creazione pipe */
  Funzione 'Missile'
 ---------------------------------------------------------------------- 
 */
-void Missile(int pipeout, int x, int y, type_m tipo)
+void Missile(int pipeout, int x, int y)
 {
 struct position missile1, missile2;
 int deltax;		
@@ -138,11 +136,17 @@ char c;
     bool flag=false;
     
    	
-   	while(true){	//questo ciclo serve a non far premere backspace per ogni movimento del missile
+   	do{	//questo ciclo serve a non far premere backspace per ogni movimento del missile
    	//al momento servono due backspace per far funzionare il missile: uno per farlo comparire e uno per lanciarlo
-	   	
-	    /* Se supero area X schermo esco dal processo*/
-	    if(missile1.x + deltax < 1 || missile2.x + deltax == MAXX){
+
+		
+	    missile1.y += deltay1;
+	    missile2.y += deltay2;
+	    missile1.x += deltax;
+	    missile2.x += deltax;
+	    
+	     /* Se supero area X schermo esco dal processo*/
+	    if(missile1.x + deltax < 1 && missile2.x + deltax == MAXX){
 		exit(0);
 	    }
 
@@ -150,12 +154,6 @@ char c;
 	    if(missile1.y + deltay1 < 1 || missile2.y + deltay2 == MAXY){
 	      exit(0);
 	    }
-
-		
-	    missile1.y += deltay1;
-	    missile2.y += deltay2;
-	    missile1.x += deltax;
-	    missile2.x += deltax;
 		
 	    /* Comunico le coordinate correnti al processo padre */
 	    write(pipeout,&missile1,sizeof(missile1));
@@ -163,7 +161,10 @@ char c;
 
 			/* Inserisco una pausa per rallentare il movimento */
 	    usleep(DELAY);
-    }
+	    
+    }while(missile1.y + deltay1 != 0 || missile2.y + deltay2 != MAXY);	//doppio controllo
+    
+    exit(0);
    
   
 }
@@ -192,7 +193,6 @@ void Nemico(int pipeout){
 	
 	write(pipeout,&nemico,sizeof(nemico));
 	
-	usleep(DELAY);
 	usleep(DELAY);
 	}
 	
@@ -239,37 +239,27 @@ struct position apos;
     
     
     if(c==32){
-    int pidM1, pidM2, status;
+    int pidM1, status;
     pidM1=fork();
-    pidM2=fork();
 					
 				
      		if(pidM1==0) {
 						
-
-					/* ed eseguo quindi la relativa funzione di gestione */
-					//close(pipein); /* chiusura del descrittore di lettura */
-					Missile(pipeout, apos.x, apos.y, GOES_DOWN); /* invocazione funzione col missile che va giu'*/  
-					//Missile(pipeout, apos.x, apos.y, GOES_UP);
+					
+					close(pipein); 
+					Missile(pipeout, apos.x, apos.y); 
+					
+					
      		}
      		else {
-     			wait(&status);
-     			//pidM2=fork();
-     			
-     			//if(pidM2==0){
-     					//close(pipein); /* chiusura del descrittore di lettura */
-					//Missile(pipeout, apos.x, apos.y, GOES_UP); /* invocazione funzione col missile che va su */ 
-			//}
-			//else{
-					/* Sono ancora nel processo padre */
-					//wait(status);
-					close(pipeout); /* chiusura del descrittore di scrittura */
-			    		Area(pipein);  /* invocazione funzione area */  
-			//}
+     			waitpid(pidM1, &status);
+			close(pipeout); 
+	    		Area(pipein);  
+			
      		}
      		
      		kill(pidM1,1);
-     		//kill(pidM2,1);
+     		
 	}
   }
 		
@@ -321,7 +311,7 @@ int i=0, collision=0;
         
         //nemico
         if(dato_letto.c=='n'){
-        mvprintw(nemico.y, nemico.x, (char*)blankSprite);
+        mvaddch(nemico.y, nemico.x, ' ');
         nemico=dato_letto;}
        
 
@@ -330,7 +320,7 @@ int i=0, collision=0;
    	}
 		
 		/* Visualizzo il carattere dell'entità sulle nuove coordinate */
-   if(missile.y !=20 && dato_letto.c=='o') mvaddch(dato_letto.y,dato_letto.x,dato_letto.c);
+   if(missile.y !=20 && missile.y!=0 && dato_letto.c=='o') mvaddch(dato_letto.y,dato_letto.x,dato_letto.c);
    
    if(dato_letto.c=='#') {
    	mvprintw(dato_letto.y, dato_letto.x, (char*)spriteLine);
@@ -342,11 +332,11 @@ int i=0, collision=0;
    
    if(dato_letto.c=='n')
    	{ 
-   		mvprintw(dato_letto.y, dato_letto.x, (char*)spriteEnemy);
+   		mvaddch(dato_letto.y, dato_letto.x, 'n');
    	}
    				
   
-
+	
 		
 
 			 
@@ -355,6 +345,7 @@ int i=0, collision=0;
        refresh();
 
  } while(true);
+ 
 }
 
 
