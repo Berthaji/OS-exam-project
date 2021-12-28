@@ -1,11 +1,14 @@
 default:
-	gcc main.c Scene.c task.c -o gioco -lncurses
+	gcc main.c Scene.c task.c Utils.c -o gioco -lncurses
 	
 threaded:
-	gcc main.c Scene.c task.c -o gioco -lncurses -DTHREADED
+	gcc main.c Scene.c task.c Utils.c -o gioco -lncurses -DTHREADED
 
 build_debug:
-	gcc main.c Scene.c task.c  -o gioco -lncurses -Wall
+	gcc main.c Scene.c task.c Utils.c -o gioco -lncurses -Wall
+
+bugs:
+	gcc main.c Scene.c task.c Utils.c -o gioco -lncurses -Wall -Wextra -g
 
 run:
 	./gioco
@@ -13,7 +16,7 @@ run:
 
 all:
 	rm ./gioco 2> /dev/null
-	gcc main.c Scene.c task.c -o gioco -lncurses
+	gcc main.c Scene.c task.c Utils.c -o gioco -lncurses
 	./gioco
 	stty sane
 
@@ -26,3 +29,7 @@ clean:
 
 fix:
 	stty sane
+	stty sane
+	stty sane
+	stty sane
+	clear

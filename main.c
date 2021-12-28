@@ -17,15 +17,17 @@
 
 int main(){
     //Inizializzo il seed del generatore casuale
-    srand(time(NULL));
+    srand(getpid());
 
     //init della libreria grafica
     initScreen();
+    
     //motore di gioco basato su processi
-    pEngine();  
+    pEngine(LIFES);  
 
     //ripristino della finestra del terminale
     endwin();
+    printf("\n Game Over \n");
     return 0;
 }
 

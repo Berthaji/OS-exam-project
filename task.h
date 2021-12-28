@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdio.h>
 
 #include <signal.h>
 #include <stdio.h>
@@ -16,18 +15,20 @@
 #include <signal.h>
 
 #include "Scene.h"
-
+#include "Utils.h"
 // void player();
 // void game();
 // void enemy();
 
 void initProcTask();
 void pAstroship(int pipeOut, object o);
-void pEnemy(int pipeOut, object o);
-void pBomb(int filedescriptor);
-void pMissile(int filedescriptor, int direction, object o);
-void pEngine();
+void pEnemy1(int pipeOut, object o);
+void pEnemy2(int pipeOut, object o);
+void pBomb(int pipeOut, object o);
+void pMissile(int pipeOut, object o);
+void pEngine(int life);
 void pEnd();    
+
 
 
 void debugPositions(

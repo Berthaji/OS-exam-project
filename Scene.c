@@ -42,16 +42,17 @@ char enemy_sprites[ENEMYDCHOICE][3][4] = {
 
     //Enemy 2
     {
-        {"   "},
+        {"  x"},
         {"<=="},
-        {"   "}},
+        {"  x"}},
 
     //Enemy 3
     {
         {"<= "},
         {"oo-"},
         {"<= "}},
-    //Enemy 4 
+
+    //Nemico 4 (il nemico di secondo livello)
     {
         {"X X"},
         {"   "},
@@ -81,9 +82,17 @@ void initScreen()
     curs_set(0);
     start_color();
 
-    init_pair(1, COLOR_RED, COLOR_BLACK);   /* Colore oggetto */
-    init_pair(2, COLOR_BLACK, COLOR_BLACK); /* Colore per cancellare */
-    init_pair(3, COLOR_GREEN, COLOR_BLACK); /* Colore per cancellare */
+    init_pair(1, COLOR_RED, COLOR_BLACK);     /* Colore oggetto */
+    init_pair(2, COLOR_BLACK, COLOR_BLACK);   /* Colore per cancellare */
+    init_pair(3, COLOR_GREEN, COLOR_BLACK);   /* Colore per cancellare */
+    init_pair(4, COLOR_BLUE, COLOR_BLACK);    /* Colore per cancellare */
+    init_pair(5, COLOR_CYAN, COLOR_BLACK);    /* Colore per cancellare */
+    init_pair(6, COLOR_MAGENTA, COLOR_BLACK); /* Colore per cancellare */
+    init_pair(7, COLOR_RED, COLOR_BLACK);     /* Colore per cancellare */
+    init_pair(8, COLOR_YELLOW, COLOR_BLACK);  /* Colore per cancellare */
+    init_pair(9, COLOR_WHITE, COLOR_BLACK);   /* Colore per cancellare */
+
+  //  attron(COLOR_PAIR(8));
 }
 
 /**
@@ -93,31 +102,42 @@ void initScreen()
 void drawScene(
     object astroship,
     object *enemies, int enemiesCount,
+    object *enemies2, int enemies2Count,
     object *missiles, int missilesCount,
     object *bombs, int bombsCount)
 {
     clearScreen();
+
     drawObject(astroship);
 
     int i;
     for (i = 0; i < enemiesCount; i++)
-        drawObject(enemies[i]);
+        if (enemies[i].state != DEAD)
+            drawObject(enemies[i]);
+
+    for (i = 0; i < enemies2Count; i++)
+        if (enemies2[i].state != DEAD)
+            drawObject(enemies2[i]);
 
     for (i = 0; i < bombsCount; i++)
-        drawObject(bombs[i]);
+        if (bombs[i].state != DEAD)
+            drawObject(bombs[i]);
 
     for (i = 0; i < missilesCount; i++)
-        drawObject(missiles[i]);
+        if (missiles[i].state != DEAD)
+            drawObject(missiles[i]);
+
     refresh();
 }
 
 /**
- * @brief Drawing the single object 
+ * @brief Disegno del singolo oggetto
  * 
- * @param entity Object to draw
+ * @param entity Oggetto da disegnare
  */
-void drawObject(object entity)
-{
+void drawObject(object entity){
+    //attron(COLOR_PAIR(entity.color)); //Colore del singolo oggetto
+
     switch (entity.type){
         case ASTROSHIP:{
             for (int j = 0; j < ASTRODIM; j++)
@@ -126,16 +146,14 @@ void drawObject(object entity)
         }
 
         case ENEMY1:{
-
             for (int j = 0; j < ENEMYDIM; j++)
                 mvprintw(entity.y + j, entity.x, enemy_sprites[entity.appearance][j]);
             break;
         }
-        
-        case ENEMY2:{
 
+        case ENEMY2:{
             for (int j = 0; j < ENEMYDIM; j++)
-                mvprintw(entity.y + j, entity.x, enemy_sprites[entity.appearance][3]);
+                mvprintw(entity.y + j, entity.x, enemy_sprites[3][j]);
             break;
         }
 
@@ -146,7 +164,6 @@ void drawObject(object entity)
         case BOMB:
             mvprintw(entity.y, entity.x, "O");
             break;
-
     }
-
+    //attroff(COLOR_PAIR(entity.color));
 }
