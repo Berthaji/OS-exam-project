@@ -99,7 +99,7 @@ void initScreen()
  * 
  */
 void drawScene(
-    object astroship,
+    object *astroship,
     object *enemies, int enemiesCount,
     object *enemies2, int enemies2Count,
     object *missiles, int missilesCount,
@@ -107,7 +107,7 @@ void drawScene(
 {
     clearScreen();
 
-    drawObject(astroship);
+    drawObject(*astroship);
 
     int i;
     for (i = 0; i < enemiesCount; i++)

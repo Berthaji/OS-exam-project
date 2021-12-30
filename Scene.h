@@ -24,7 +24,7 @@
 #define delaytime       10000       //Delay time in the game
 
 #define SHOT_PROB       7          //Probabilità di rilasciare la bomba (su 1000)
-#define LIFES           0          //Numero di vite
+#define LIFES           3          //Numero di vite
 
 #define SCREEN_W getmaxx(stdscr)
 #define SCREEN_H getmaxy(stdscr)
@@ -35,7 +35,7 @@ void clearScreen();
 
 
 void drawScene(
-    object astroship,
+    object *astroship,
     object *enemies, int enemiesCount, 
     object *enemies2, int enemies2Count, 
     object *missiles, int missilesCount,

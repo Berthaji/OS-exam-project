@@ -45,6 +45,9 @@ void pAstroship(int pipeOut, object o){
         
             case ' ': //Barra spaziatrice
                 //alarm(1);
+                printf("\n");
+                printf("\a");
+                printf("\n");
                 o.hasShot = true;
                 break;
 
@@ -234,8 +237,11 @@ void pEngine(int life){
     int enemies2Count = 0;
     int bombsCount = 0;
     int missilesCount = 0;
+
+    int status = -1;
+    bool loop = true;           //Regolatore della condizione per per il continuo del loop e quindi delle condizioni di giocabilità
     
-    object astroship;
+    object *astroship = (object *)malloc(sizeof(object) * 1);
     object *enemies1 = (object *)malloc(sizeof(object) * M);
     object *enemies2 = (object *)malloc(sizeof(object) * 1);
     object *bombs    = (object *)malloc(sizeof(object) * 1);
@@ -245,8 +251,8 @@ void pEngine(int life){
 
     //variabili di supporto
     object message; //qui viene salvato il messaggio letto dalla pipe dei processi
-    bool loop = true; //controlla l'esecuzione del while principale
-    int status = -1; //Tipologia di uscita (abbiamo vinto, perso per nemici a bordo schermo...)make all
+    //bool loop = true; //controlla l'esecuzione del while principale
+    //int status = -1; //Tipologia di uscita (abbiamo vinto, perso per nemici a bordo schermo...)make all
    
     /**
      * L'array seguente conterrà il file descriptor della pipe
@@ -266,13 +272,15 @@ void pEngine(int life){
     int color = (rand()%7)+1;
     attron(COLOR_PAIR(color));
 
-    //Inizializzazione della astronave   
-    astroship.x = 1;
-    astroship.y = (SCREEN_H - 3) / 2;
-    astroship.type = ASTROSHIP;
-    astroship.hasShot = false;
-    astroship.color = color;
-    astroship.appearance = rand() % ASTRODCHOICE;
+    //Inizializzazione della astronave  
+   
+
+    astroship->x = 1;
+    astroship->y = (SCREEN_H - 3) / 2;
+    astroship->type = ASTROSHIP;
+    astroship->hasShot = false;
+    astroship->color = color;
+    astroship->appearance = rand() % ASTRODCHOICE;
     
     /**
      * Creiamo il processo del giocatore utilizzando la fork
@@ -280,15 +288,25 @@ void pEngine(int life){
      * per cui dirigiamo l'esecuzione verso la funzione relativa
      * Altrimenti continuiamo con il codice principale
      */
-    pid_t player_pid = fork();
-    if (player_pid == 0)
-        pAstroship(fs[1], astroship);
+    //pid_t player_pid = fork(); PID: 7823
+                        //PID: 7836
+
+    //bombs[i].pid = fork();
+
+
+    astroship->pid = fork();
+
+    if (astroship->pid == 0){
+        //astroship->pid = getpid();
+        pAstroship(fs[1], *astroship);
+    }
 
     else{
         sleep(1);
         //Processo padre
 
         //Generazione dei nemici di primo livello (Stesso aspetto per tutti i nemici)
+        
         int enemyappereace = rand()% (ENEMYDCHOICE -1); //L'ultimo aspetto è riservato ai nemici di secondo livello
         for (int i = 0, x = 0, y = 1; i < enemies1Count; i++){
             enemies1[i].type = ENEMY1;
@@ -315,17 +333,23 @@ void pEngine(int life){
     }
 
 
+    
+
     //loop del gioco, you dont say
     while (loop){
+        
         read(pipeIn, &message, sizeof(object));
+
+        
+
 
         //in questo switch va gestita la logica del gioco
         switch (message.type){
             case ASTROSHIP:{
-                astroship.type = message.type;
-                astroship.x = message.x;
-                astroship.y = message.y;
-                astroship.appearance = message.appearance;
+                astroship->type = message.type;
+                astroship->x = message.x;
+                astroship->y = message.y;
+                astroship->appearance = message.appearance;
                 
                 //Lancio dei due missili
                 if (message.hasShot){                   //Lancio dei due missili
@@ -355,8 +379,8 @@ void pEngine(int life){
 
             case ENEMY1:{
                 //Controllo per vedere se ha evaso l'area di gioco
-                if(message.state == KILLED)
-                    status = 2;
+                //if(message.state == KILLED)
+                    //status = 2;
 
                 int id = message.id;
                 
@@ -384,23 +408,24 @@ void pEngine(int life){
             
                 
                 //Controllo dell'incrocio con l'oggetto astronave
-                int match = AstroCollided(astroship,enemies1[id]); 
+                int match = AstroCollided(*astroship,enemies1[id]); 
                 if(match > -1){  //Match nemico astronave
-                    life--;
+                    //life--;
                     
                     //Ammazzo il nemico colpito
                     kill(enemies1[id].pid, SIGKILL);
+                    //wait(NULL);
                     enemies1[id].y = 0;
                     enemies1[id].x = 0;
                     enemies1[id].state = DEAD;
 
                     //Ammazzo l'astronave stessa
-                    if(astroship.state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
+                    if(astroship->state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
                         //Ammazzo l'astronave stessa
-                        kill(astroship.pid, SIGKILL);
-                        astroship.y = -1;
-                        astroship.x = -1;
-                        astroship.state = DEAD;                                            
+                        kill(astroship->pid, SIGKILL);
+                        astroship->y = -1;
+                        astroship->x = -1;
+                        astroship->state = DEAD;                                            
 
                     }  
 
@@ -430,9 +455,9 @@ void pEngine(int life){
 
 
                 //Controllo dell'incrocio con l'oggetto astronave
-                int match = AstroCollided(astroship,bombs[id]); 
+                int match = AstroCollided(*astroship,bombs[id]); 
                 if(match > -1){  //Match nemico astronave
-                    life--;
+                    //life--;
                     //Ammazzo il nemico colpito
                     if(bombs[id].state != DEAD){  
                         kill(bombs[id].pid, SIGKILL);
@@ -441,12 +466,12 @@ void pEngine(int life){
                         bombs[id].state = DEAD;
                     }
                     
-                    if(astroship.state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
+                    if(astroship->state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
                         //Ammazzo l'astronave stessa
-                        kill(astroship.pid, SIGKILL);
-                        astroship.y = -1;
-                        astroship.x = -1;
-                        astroship.state = DEAD;                                            
+                        kill(astroship->pid, SIGKILL);
+                        astroship->y = -1;
+                        astroship->x = -1;
+                        astroship->state = DEAD;                                            
 
                     }
 
@@ -501,7 +526,7 @@ void pEngine(int life){
                                                
                         //Ammazzo il nemico colpito
                         kill(enemies1[enemyid].pid, SIGKILL);
-                        enemies1[enemyid].y = -5;
+                        enemies1[enemyid].y = 0;
                         enemies1[enemyid].x = 0;
                         enemies1[enemyid].state = DEAD;
 
@@ -520,7 +545,7 @@ void pEngine(int life){
                         missiles[id].state = DEAD;
 
                         kill(enemies2[enemy2id].pid, SIGKILL);
-                        enemies2[enemy2id].y = -5;
+                        enemies2[enemy2id].y = 0;
                         enemies2[enemy2id].x = 0;
                         enemies2[enemy2id].state = DEAD;
 
@@ -559,23 +584,23 @@ void pEngine(int life){
 
 
                 //Controllo dell'incrocio con l'oggetto astronave
-                int match = AstroCollided(astroship,enemies2[id]); 
+                int match = AstroCollided(*astroship,enemies2[id]); 
                 if(match > -1){  //Match nemico astronave
-                    life--;
+                    //life--;
 
                     //Kill del nemico stesso
                     kill(enemies2[id].pid, SIGKILL);
-                    enemies2[id].y = -5;
+                    enemies2[id].y = 0; //-5;
                     enemies2[id].x = 0;
                     enemies2[id].state = DEAD;
 
                     
-                    if(astroship.state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
+                    if(astroship->state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
                         //Ammazzo l'astronave stessa
-                        kill(astroship.pid, SIGKILL);
-                        astroship.y = -1;
-                        astroship.x = -1;
-                        astroship.state = DEAD;                                            
+                        kill(astroship->pid, SIGKILL);
+                        astroship->y = -1;
+                        astroship->x = -1;
+                        astroship->state = DEAD;                                            
 
                     }
                     
@@ -586,10 +611,10 @@ void pEngine(int life){
                 }
 
 
-                //Controllo per vedere se ha evaso l'area di gioco
-                if(enemies2[id].x < 0 && enemies2[id].y > 0 &&
-                    enemies2[id].x != 0 && enemies2[id].y != -5 )
-                    loop = false;
+                //Controllo per vedere se ha evaso l'area di gioco (da rivedere $$)
+                // if(enemies2[id].x < 0 && enemies2[id].y > 0 &&
+                //     enemies2[id].x != 0 && enemies2[id].y != -5 )
+                //     //loop = false;
 
 
                 if (message.state == DEAD){
@@ -605,137 +630,172 @@ void pEngine(int life){
 
 
         drawScene(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);
+        //pPID(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount, fs);
         //debugPositions(astroship, enemies1, enemies1Count, missiles, missilesCount, bombs, bombsCount);
         
 
-        //Condizioni di game over
+        //Condizioni di game over --> DA UNIFICARE COL RESTO... $$
         //1. Astronave colpita da un nemico (se ho solo una vita, gia gestito)
         //2. Tutte le navicelle nemiche sono state distrutte (win)
         //Faccio un ciclo su tutti i nemici
-        bool enemiesDead = true;
-        int i;
-        for (i = 0; i < enemies1Count; i++)
-            if (enemies1[i].state != DEAD)
-                enemiesDead = false;
-        for (i = 0; i < enemies2Count; i++)
-            if (enemies2[i].state != DEAD)
-                enemiesDead = false; 
+        // bool enemiesDead = true;
+        // int i;
+        // for (i = 0; i < enemies1Count; i++)
+        //     if (enemies1[i].state != DEAD)
+        //         enemiesDead = false;
+        // for (i = 0; i < enemies2Count; i++)
+        //     if (enemies2[i].state != DEAD)
+        //         enemiesDead = false; 
 
+        // if(status > 0 || enemiesDead)
+        //     loop = false;
         
         //status = enemiesDead ? 1 : -1;           
-        
         //Status = -1 => si gioca ancora
         //Status = 0 => 
         //Status = 1 => si esce dal gioco come vincitori
         //Status = 2 => si esce perdenti (navicelle a sx)
-        //Status = 3 => 
+        //Status = 3 => si esce perdenti (life == 0)
 
-
-        if(status > 0 || enemiesDead)
+        //loop = loopConditions();
+        
+        status = statusConditions(life, enemies1, enemies1Count, enemies2, enemies2Count);
+        if(status > 0)
             loop = false;
         
-        mvprintw(0,0, "VITE: %d - STATUS %d", life, status);
+        mvprintw(0,0, "VITE: %d - STATUS: %d", life, status);
         refresh();
         
 
     }
     //Usciti dal loop, abbiamo vinto o perso
     //funzione killa robe
+    pEnd(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount, fs);
+
+    mvprintw(0,0, "STATUS: %d", status);
+    refresh();
+    sleep(3);
 
 }
 
 void pEnd( 
-    object astroship,
+    object *astroship,
     object *enemies, int enemiesCount,
     object *enemies2, int enemies2Count,
     object *missiles, int missilesCount,
-    object *bombs, int bombsCount)
+    object *bombs, int bombsCount, 
+    int fs[])
 {
     //The game is closing, so let's close all the remaining process!
     clearScreen();
 
-    if (astroship.state != DEAD)
-        kill(astroship.pid,SIGKILL);
+    if (astroship->state != DEAD)
+        kill(astroship->pid,SIGKILL);
 
-    // int i;
-    // for (i = 0; i < enemiesCount; i++)
-    //     if (enemies[i].state != DEAD)
-    //         kill(enemies[i].pid,SIGKILL);
+    int i;
+    for (i = 0; i < enemiesCount; i++)
+        if (enemies[i].state != DEAD)
+            kill(enemies[i].pid,SIGKILL);
 
-    // for (i = 0; i < enemies2Count; i++)
-    //     if (enemies2[i].state != DEAD)
-    //         kill(enemies2[i].pid,SIGKILL);
+    for (i = 0; i < enemies2Count; i++)
+        if (enemies2[i].state != DEAD)
+            kill(enemies2[i].pid,SIGKILL);
 
-    // for (i = 0; i < bombsCount; i++)
-    //     if (bombs[i].state != DEAD)
-    //         kill(bombs[i].pid,SIGKILL);
+    for (i = 0; i < bombsCount; i++)
+        if (bombs[i].state != DEAD)
+            kill(bombs[i].pid,SIGKILL);
 
-    // for (i = 0; i < missilesCount; i++)
-    //     if (missiles[i].state != DEAD)
-    //         kill(missiles[i].pid,SIGKILL);
+    for (i = 0; i < missilesCount; i++)
+        if (missiles[i].state != DEAD)
+            kill(missiles[i].pid,SIGKILL);
 
-    // free(&astroship);
-    // free(enemies);
-    // free(enemies2);
-    // free(bombs);
-    // free(missiles);
+    free(astroship);         //In teoria astroship dovrebbe diventare un puntatore e quindi nel progetto avrò un bel po da cambiare
+    free(enemies);
+    free(enemies2);
+    free(bombs);
+    free(missiles);
+
+    close(fs[0]);
+    close(fs[1]);
  
 }
 
-void debugPositions(
-    object astroship,
+void pPID( 
+    object *astroship,
     object *enemies, int enemiesCount,
+    object *enemies2, int enemies2Count,
     object *missiles, int missilesCount,
-    object *bombs, int bombsCount)
-{
-    clearScreen();
+    object *bombs, int bombsCount, 
+    int fs[]){
 
-    //Astronave
-    mvprintw(0, 0, "OBJ: %d \t\t\tx: %d \t\t\ty: %d \t\t\tpid: %d \n",
-             astroship.type,
-             astroship.x,
-             astroship.y,
-             astroship.pid);
+    //PID Astronave
+    int i, j = 1;
+    mvprintw(j,0, "PID AS: %d - STATUS: %d", astroship->pid, astroship->state);
 
-    int j = 1;
-    //Nemici
-    for (int i = 0; i < enemiesCount; i++)
-    {
-        mvprintw(j, 0, "OBJ: %d \t\t\tx: %d \t\t\ty: %d \t\t\tpid: %d \n",
-                 enemies[i].type,
-                 enemies[i].x,
-                 enemies[i].y,
-                 enemies[i].pid);
-
+    //PID Nemici 1
+    for (i = 0; i < enemiesCount; i++){
         j++;
+        mvprintw(j,0, "PID N1: %d - STATUS: %d", enemies[i].pid, enemies[i].state);
     }
-
-    //Bombe
-    for (int i = 0; i < bombsCount; i++)
-    {
-        mvprintw(j, 0, "OBJ: %d \t\t\tx: %d \t\t\ty: %d \t\t\tpid: %d \n",
-                 bombs[i].type,
-                 bombs[i].x,
-                 bombs[i].y,
-                 bombs[i].pid);
-
+    //PID Nemici 2
+    for (i = 0; i < enemies2Count; i++){
         j++;
+        mvprintw(j,0, "PID N2: %d - STATUS: %d", enemies2[i].pid, enemies2[i].state);
     }
-
-    //Missili
-    for (int i = 0; i < missilesCount; i++)
-    {
-        mvprintw(j, 0, "OBJ: %d \t\t\tx: %d \t\t\ty: %d \t\t\tpid: %d \n",
-                 missiles[i].type,
-                 missiles[i].x,
-                 missiles[i].y,
-                 missiles[i].pid);
-
+    //PID Bombe
+    for (i = 0; i < bombsCount; i++){
         j++;
+        mvprintw(j,0, "PID BM: %d - STATUS: %d", bombs[i].pid, bombs[i].state);
     }
-
-    refresh();
-    //sleep(3);
+    //PID Missili
+    for (i = 0; i < missilesCount; i++){
+        j++;
+        mvprintw(j,0, "PID MS: %d", missiles[i].pid, missiles[i].state);
+    }
 }
 
 
+int statusConditions(bool life,
+    object *enemies1, int enemies1Count,
+    object *enemies2, int enemies2Count){
+
+    int status = -1;
+    //1. nelle condizioni, se l'array dei nemici hanno tutti pid = -1, allora imposta >> status = 1 (e loop = false)
+    bool enemiesDead = true;           
+    int i;
+    for (i = 0; i < enemies1Count; i++)
+        if (enemies1[i].pid != -1)
+            enemiesDead = false;
+    for (i = 0; i < enemies2Count; i++)
+        if (enemies2[i].pid != -1)
+            enemiesDead = false; 
+
+    if(enemiesDead)        //Se sono morti, status == 1
+        status = 1;
+
+    //2. nelle condizioni, se life (perchè legato a doppia mandata col numero di astroship) è == 0, allora status = 3 (e loop false)
+    if(life < 1)
+        status = 3;
+
+
+
+    //3.  nelle condizioni, se almeno un nemico arriva a bordo schermo, allora loop == false e status == 2
+
+    // arrivare a abordo schermo => ciclo su coordinate dei nemici (x < 0 e  0 < y > DIMSCHERMO )
+    
+    for (i = 0; i < enemies1Count; i++)
+        if (enemies1[i].x < 1 && enemies1[i].y > 0 && enemies1[i].y < SCREEN_H)
+            status = 2;
+    for (i = 0; i < enemies2Count; i++)
+        if (enemies2[i].x < 1 && enemies2[i].y > 0 && enemies2[i].y < SCREEN_H)
+            status = 2;
+
+           
+        //Status = -1 => si gioca ancora
+        //Status = 0 => 
+        //Status = 1 => si esce dal gioco come vincitori
+        //Status = 2 => si esce perdenti (navicelle a sx)
+        //Status = 3 => si esce perdenti (life == 0)
+
+    return status;
+}

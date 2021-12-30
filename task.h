@@ -27,12 +27,27 @@ void pEnemy2(int pipeOut, object o);
 void pBomb(int pipeOut, object o);
 void pMissile(int pipeOut, object o);
 void pEngine(int life);
-void pEnd();    
 
-
-
-void debugPositions(
-    object astroship,
+void pEnd( 
+    object *astroship,
     object *enemies, int enemiesCount,
+    object *enemies2, int enemies2Count,
     object *missiles, int missilesCount,
-    object *bombs, int bombsCount);
+    object *bombs, int bombsCount, int fs[]);   
+
+
+void pPID( 
+    object *astroship,
+    object *enemies, int enemiesCount,
+    object *enemies2, int enemies2Count,
+    object *missiles, int missilesCount,
+    object *bombs, int bombsCount, 
+    int fs[]);
+
+
+int statusConditions(bool life,
+    object *enemies1, int enemies1Count,
+    object *enemies2, int enemies2Count);
+
+
+
