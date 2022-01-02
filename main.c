@@ -15,15 +15,36 @@
 #include "task.h"
 
 
+
+
 int main(){
     //Inizializzo il seed del generatore casuale
     srand(getpid());
 
+    //Parametri di gioco 
+    int ENEMYSLEEP = 150000;        //Timer per i nemici
+    int M = 4;                      //Enemy quantity (according to project's specifications)
+    //int delaytime = 10000;          //Delay time in the game
+    int SHOT_PROB =  0;             //Probabilità di rilasciare la bomba (su 1000)
+    int LIFES = 3;                  //Numero di vite
+
+    /**
+     * Seleziona la modalità di gioco (spazio per confermare)
+        FACILE -> 250k,     3     3     4
+        MEDIA  ->  150k,    4     4     3   
+        DIFFICILE -> 100k,  6     7     1 
+        ABBASTANZA CASUALE -> tutto rand
+     * 
+     */
+
     //init della libreria grafica
     initScreen();
     
+    //Menu di gioco
+    //...
+
     //motore di gioco basato su processi
-    pEngine(1);
+    pEngine(3);
     
     refresh();
     sleep(3);

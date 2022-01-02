@@ -20,6 +20,14 @@
 // void game();
 // void enemy();
 
+// #define ENEMYSLEEP      150000      //Timer per i nemici
+
+// #define M               4           //Enemy quantity (according to project's specifications)
+// #define delaytime       10000       //Delay time in the game
+
+// #define SHOT_PROB       0          //Probabilità di rilasciare la bomba (su 1000)
+// #define LIFES           3          //Numero di vite
+
 void initProcTask();
 void pAstroship(int pipeOut, object o);
 void pEnemy1(int pipeOut, object o);

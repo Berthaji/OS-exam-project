@@ -105,7 +105,9 @@ void pEnemy1(int pipeOut, object o){
         //o.dir = direction;
 
         write(pipeOut, &o, sizeof(o)); //comunichiamo il risultato dell'eleborazione
-        usleep(100000);                 // un delay per evitare che il nemico vada troppo veloce
+        //usleep(300000);                 // un delay per evitare che il nemico vada troppo veloce
+        //sleep(2);
+        usleep(ENEMYSLEEP);
     }
     //harakiri
     kill(getpid(), SIGKILL);
@@ -151,7 +153,9 @@ void pEnemy2(int pipeOut, object o){
         //o.dir = direction;
 
         write(pipeOut, &o, sizeof(o)); //comunichiamo il risultato dell'eleborazione
-        usleep(100000);                 // un delay per evitare che il nemico vada troppo veloce
+        //usleep(100000);                 // un delay per evitare che il nemico vada troppo veloce
+        //sleep(2);
+        usleep(ENEMYSLEEP);
     }
     //harakiri
     kill(getpid(), SIGKILL);
@@ -234,6 +238,7 @@ void pEngine(int life){
     //life = 3;
     int enemies1Count = M;
     int enemies2Count = 0;
+    int missile2Count = 0;
     int bombsCount = 0;
     int missilesCount = 0;
 
@@ -246,7 +251,7 @@ void pEngine(int life){
     object *bombs    = (object *)malloc(sizeof(object) * 1);
     object *missiles = (object *)malloc(sizeof(object) * missilesCount);
 
-    
+    bool *doubleMissile = (bool *) malloc(sizeof(bool)*1);      //Array per contenere il fatto che il nemico di secondo livello sia stato attaccato 2 volte
 
     //variabili di supporto
     object message; //qui viene salvato il messaggio letto dalla pipe dei processi
@@ -475,14 +480,14 @@ void pEngine(int life){
                         bombs[id].state = DEAD;
                     }
                     
-                    if(astroship->state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
-                        //Ammazzo l'astronave stessa
-                        kill(astroship->pid, SIGKILL);
-                        astroship->y = -1;
-                        astroship->x = -1;
-                        astroship->state = DEAD;                                            
+                    // if(astroship->state != DEAD){  //Ammazzo astronave solo se viene colpito una volta
+                    //     //Ammazzo l'astronave stessa
+                    //     kill(astroship->pid, SIGKILL);
+                    //     astroship->y = -1;
+                    //     astroship->x = -1;
+                    //     astroship->state = DEAD;                                            
 
-                    }
+                    // }
 
                     // if(life == 0){
                     //     pEnd(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);
@@ -521,6 +526,11 @@ void pEngine(int life){
                         enemies2Count++;
                         enemies2 = (object *)realloc(enemies2, sizeof(object) * enemies2Count);
 
+                        missile2Count++;
+                        doubleMissile = (bool *)realloc(doubleMissile, sizeof(bool) * missile2Count);
+                        doubleMissile[missile2Count] = false;
+
+
                         for (int i = enemies2Count - 1; i < enemies2Count; i++){
                             enemies2[i].x = enemies1[enemyid].x-1; //message.x; 
                             enemies2[i].y = enemies1[enemyid].y; //message.y; 
@@ -550,24 +560,34 @@ void pEngine(int life){
 
 
                 //Controllo delle collisioni coi nemici di secondo livello
+                //Controlliamo se è stato colpito 2 volte
                 int enemy2id = MissileCollided(enemies2,missiles[id],enemies2Count);
-                if(enemy2id > -1){  //Match nemico2 missile
+
+
+                if(doubleMissile[enemy2id] == true && enemy2id > -1){  //Match nemico2 missile (colpito almeno 2 volte)
                     if(enemies2[enemy2id].state != DEAD){  //Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile)
-                        //Ammazzo il missile stesso
-                        kill(missiles[id].pid, SIGKILL);
-                        missiles[id].y = -1;
-                        missiles[id].x = -1;
-                        missiles[id].state = DEAD;
 
                         kill(enemies2[enemy2id].pid, SIGKILL);
                         enemies2[enemy2id].y = 0;
                         enemies2[enemy2id].x = 0;
                         enemies2[enemy2id].state = DEAD;
+                        
+                        //Se noti che il nemico2 muore subito, forse nella pipe è rimasto ancora qualche oggetto missile
 
                         printf("\n");
                         printf("\a");
                         printf("\n");
                     }
+                }
+
+                if(doubleMissile[enemy2id] == false && enemy2id > -1){         // Un nemico lv. 2 Non è mai stato colpito prima, impostiamo su true
+                    doubleMissile[enemy2id] = true;
+
+                    //Ammazzo il missile stesso
+                    kill(missiles[id].pid, SIGKILL);
+                    missiles[id].y = -1;
+                    missiles[id].x = -1;
+                    missiles[id].state = DEAD;
                 }
 
                 if (message.state == DEAD){
@@ -580,7 +600,7 @@ void pEngine(int life){
                 int id = message.id;
 
                 //Test per vedere se nella pipe è rimasto un nemico 2 per sbaglio
-                if(!(enemies2[id].pid == -1)){ //Dovresti essere morto, ti ignoro
+                if(!(enemies2[id].pid == -1)){ //Dovresti essere morto, sono gli ultimi elementi rimasti nella pipe, ti ignoro
                 
                     enemies2[id].x = message.x;
                     enemies2[id].y = message.y; 
@@ -668,10 +688,11 @@ void pEngine(int life){
         if(status > 0)
             loop = false;
         
-        mvprintw(0,0, "VITE: %d - STATUS: %d", life, status);
 
         //Funzioni di disegno
         drawScene(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);
+        mvprintw(0,0, "VITE: %d - STATUS: %d", life, status);
+        refresh();
         //pPID(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount, fs);
         //debugPositions(astroship, enemies1, enemies1Count, missiles, missilesCount, bombs, bombsCount);
         
@@ -793,7 +814,7 @@ int statusConditions(bool life,
 
     //status = -1;
     //2. nelle condizioni, se life (perchè legato a doppia mandata col numero di astroship) è == 0, allora status = 3 (e loop false)
-    if(life < 0)
+    if(life < 1)
         status = 3;
 
 

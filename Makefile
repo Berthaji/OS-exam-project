@@ -33,3 +33,7 @@ fix:
 	stty sane
 	stty sane
 	clear
+
+sus: 
+	gcc test1.c Scene.c -o test1 -lncurses
+	./test1
