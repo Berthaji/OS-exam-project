@@ -16,7 +16,7 @@ run:
 
 all:
 	rm ./gioco 2> /dev/null
-	gcc main.c Scene.c task.c Utils.c -o gioco -lncurses
+	gcc main.c Scene.c task.c Utils.c -o gioco -lncurses -lpthread
 	./gioco
 	stty sane
 
@@ -34,6 +34,18 @@ fix:
 	stty sane
 	clear
 
-sus: 
-	gcc test1.c Scene.c -o test1 -lncurses
+sus2: 
+	gcc test2.c Scene.c -o test2 -lncurses
 	./test1
+
+sus3: 
+	gcc test3.c Scene.c -o test3 -lncurses -lpthread
+	./test1
+
+sus4: 
+	gcc test4.c Scene.c -o test4 -lncurses -lpthread
+	./test1
+
+sus8:
+	gcc test8.c Scene.c -o test8 -lncurses -lpthread
+	./test8

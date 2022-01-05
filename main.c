@@ -28,6 +28,8 @@ int main(){
     int SHOT_PROB =  0;             //Probabilità di rilasciare la bomba (su 1000)
     int LIFES = 3;                  //Numero di vite
 
+    //Inclinazione tiro astronave e navicelle nemiche liv. 1 e liv. 2
+
     /**
      * Seleziona la modalità di gioco (spazio per confermare)
         FACILE -> 250k,     3     3     4

@@ -1,5 +1,6 @@
 #pragma once
 #include <sys/types.h>
+#include <pthread.h>
 
 //Possible object types
 typedef enum TYPE {ASTROSHIP, ENEMY1, ENEMY2, BOMB, MISSILE} TYPE;
@@ -17,7 +18,6 @@ typedef struct object{
     int x;
     float y;
     
-    pid_t pid;                  //Process id
     int id;                     //usato per le bombe e i missili
     bool hasShot;               //Usato dall'astronave e dai nemici
     int color;
@@ -28,6 +28,10 @@ typedef struct object{
 
     int dir;                    //Direzione dell'oggetto (usato solo dai nemici)
     int invmov;                 //Inversione del movimento (per lo scontro tra nemici) $$deprecata, da togliere
+
+    pid_t pid;                  //Process id
+    pthread_t tid;    //Thread id
+
     
 }object;
-
+//Sarebbe Object

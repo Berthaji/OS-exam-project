@@ -47,3 +47,7 @@ void drawScene(
 void drawObject(object entity);
 
 
+bool gEnemy1(object * o, bool bo);
+bool gMissile(object * o, bool bo);
+
+

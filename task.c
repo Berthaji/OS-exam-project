@@ -72,10 +72,8 @@ void pEnemy1(int pipeOut, object o){
     o.pid = getpid();
 
     while (loop){
-        //o.dir = direction;
-
         o.x--;                   //sposto il nemico verso destra
-        o.y += o.dir ? -1 : 1; //sposto il missile in basso o in alto a seconda della sua direzione (i nemici vanno su e giu)
+        o.y += o.dir ? -1 : 1; //sposto il nemico in basso o in alto a seconda della sua direzione (i nemici vanno su e giu)
         //o.y += 0;               //Si spostano nello stesso modo
 
         //o.dir == 0 --> 1
@@ -103,16 +101,11 @@ void pEnemy1(int pipeOut, object o){
         }
 
         //o.dir = direction;
-
         write(pipeOut, &o, sizeof(o)); //comunichiamo il risultato dell'eleborazione
-        //usleep(300000);                 // un delay per evitare che il nemico vada troppo veloce
-        //sleep(2);
-        usleep(ENEMYSLEEP);
+        usleep(100000);                 // un delay per evitare che il nemico vada troppo veloce           //usleep(ENEMYSLEEP);
     }
     //harakiri
     kill(getpid(), SIGKILL);
-
-
 }
 
 
@@ -155,7 +148,11 @@ void pEnemy2(int pipeOut, object o){
         write(pipeOut, &o, sizeof(o)); //comunichiamo il risultato dell'eleborazione
         //usleep(100000);                 // un delay per evitare che il nemico vada troppo veloce
         //sleep(2);
-        usleep(ENEMYSLEEP);
+        
+        //usleep(ENEMYSLEEP);
+        usleep(100000);
+        
+        
     }
     //harakiri
     kill(getpid(), SIGKILL);
@@ -209,8 +206,6 @@ void pMissile(int pipeOut, object o){
         //o.y += 0; //o.dir ? -1 : 1; //sposto il missile in basso o in alto a seconda della sua direzione
         o.y += (o.dir ? -1 : 1)*0.625;      //$$diagonale vera
 
-
-
         /**
          * se il missile è fuori dallo schermo dobbiamo terminare il processo
          * perciò terminiamo il loop, comunichiamo al processo principale che il proiettile 
@@ -233,10 +228,10 @@ void pMissile(int pipeOut, object o){
  * in essa vengono lette le informazioni prodotte dai processi,
  * gestita la logica di gioco e predisposto tutto per il disegno su schermo
  */
-void pEngine(int life){
+void pEngine(int life, int enemiesdim, int shotProb){
     //contatori
     //life = 3;
-    int enemies1Count = M;
+    int enemies1Count = enemiesdim;
     int enemies2Count = 0;
     int missile2Count = 0;
     int bombsCount = 0;
@@ -246,7 +241,7 @@ void pEngine(int life){
     bool loop = true;           //Regolatore della condizione per per il continuo del loop e quindi delle condizioni di giocabilità
     
     object *astroship = (object *)malloc(sizeof(object) * 1);
-    object *enemies1 = (object *)malloc(sizeof(object) * M);
+    object *enemies1 = (object *)malloc(sizeof(object) * enemiesdim);
     object *enemies2 = (object *)malloc(sizeof(object) * 1);
     object *bombs    = (object *)malloc(sizeof(object) * 1);
     object *missiles = (object *)malloc(sizeof(object) * missilesCount);
@@ -320,7 +315,7 @@ void pEngine(int life){
             //Disegno dei nemici sullo schermo in modo ordinato
             enemies1[i].x = SCREEN_W * 0.75 + (x * 5);      //$$ Forzare il terminale grande almeno 32 per i nemici
             enemies1[i].y = 7 * y;
-            if (i % 4 == 3 && i != 0){
+            if (i % 4 == 3 && i != 0){                      //Impostiamo 4 file di nemici $$
                 y = 0;
                 x++;
             }
@@ -337,24 +332,13 @@ void pEngine(int life){
         }
     }
 
-    //Countdown per mascherare un bug del tempo
-    // mvprintw(0,0, "Preparati tra 3...");
-    // refresh();
-    // sleep(1);
-    // mvprintw(0,0, "Preparati tra 2...");
-    // refresh();
-    // sleep(1);
-    // mvprintw(0,0, "Preparati tra 1...");
-    // refresh();
+
     sleep(1);
 
     //loop del gioco, you dont say
     while (loop){
         
         read(pipeIn, &message, sizeof(object));
-
-        
-
 
         //in questo switch va gestita la logica del gioco
         switch (message.type){
@@ -400,7 +384,7 @@ void pEngine(int life){
                 enemies1[id].y = message.y;
 
                 //Blocco per la gestione del lancio delle bombe
-                if( (rand()%1000) < SHOT_PROB){        
+                if( (rand()%1000) < shotProb){        
                     bombsCount ++;
 
                     bombs = (object *)realloc(bombs, sizeof(object) * bombsCount);
@@ -606,7 +590,7 @@ void pEngine(int life){
                     enemies2[id].y = message.y; 
 
                     //Blocco per la gestione del lancio delle bombe
-                    if( (rand()%1000) < SHOT_PROB){        
+                    if( (rand()%1000) < shotProb){        
                         bombsCount += 1;
 
                         bombs = (object *)realloc(bombs, sizeof(object) * bombsCount);
