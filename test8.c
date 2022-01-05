@@ -40,6 +40,14 @@ void* tEnemy2(void* parameters);
 void* tBombe(void* parameters);
 void* tMissile(void* parameters);
 
+void drawScenes(
+    object *astroship,
+    //object *enemies, int enemiesCount,
+    //object *enemies2, int enemies2Count,
+    object *missiles, int missilesCount
+    //object *bombs, int bombsCount
+    );
+
 void tEnd(int i);
 
 
@@ -61,7 +69,7 @@ int main(){
         
     
     missilesCount =  (int*) malloc (sizeof(int) * 1);
-    *missilesCount = 0;         //
+    *missilesCount = 0;         //nb _,0; __,1
 
 
     int bombsCount = 0;
@@ -74,8 +82,10 @@ int main(){
     ///Allocazione spazio delle variabili globali
     //Allocazione spazio per la astronave
     astroship = (object*) malloc (sizeof(object) * 1);
+
     //Allocazione spazio per i missili
     missiles = (object*) malloc (sizeof(object) * *missilesCount);
+
     //Allocazione spazio per gli M nemici di primo livello
     enemies1 = (object*) malloc (sizeof(object) * enemies1Count);
     //Allocazione spazio per gli M nemici di secondo livello
@@ -100,12 +110,19 @@ int main(){
     
     //Per astronave
     pthread_create(&astroship->tid, NULL, tastroship, (void *)astroship);
-    
 
-    //Per nemici liv. 1    
+
+    
+    //Per i missili   
+    // for(int i = 0; i < *missilesCount; i++){
+    //     //pthread_create(&thread_id[i], NULL, &char_print, &thread2_args);
+    //     pthread_create(&missiles[i].tid, NULL, tMissile, (void *) &missiles[i]);
+    // }
+
+    // //Per nemici liv. 1    
     // for(int i = 0; i < enemies1Count; i++){
     //     //pthread_create(&thread_id[i], NULL, &char_print, &thread2_args);
-    //     pthread_create((enemies1[i].tid), NULL, &tEnemy1, &enemies1[i]);
+    //     pthread_create(&enemies1[i].tid, NULL, &tEnemy1, &enemies1[i]);
     // }
 
     
@@ -133,12 +150,14 @@ int main(){
         //Controlliamo le collisioni tra oggetti
 
         //Stampa di ogni oggetto
-        drawObject(*astroship);
+        //drawObject(*astroship);
+        //drawObject(missiles[0]);
 
         //drawScene(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);
         
-
-
+        //drawScene(astroship, enemies1, 0, enemies2, 0, missiles, 1, bombs, 0);
+        
+        drawScenes(astroship,missiles,*missilesCount);
         
 
         // mvprintw(0,0, "CORDINATE: %d", astroship->x);
@@ -172,8 +191,12 @@ void* tastroship (void* parameters){
     //Magari prima di metterci dati da rispedire, faccio un Mutex!
     //Bloccaggio di un mutex
     pthread_mutex_lock(&tMutex);
+    obj->type = ASTROSHIP;
+    obj->appearance = 2;
+    obj->hasShot = false;
     obj->x = 6;
     obj->y = 1;
+    //Mettere gli altri parametri $$
 
 
     //Sbloccaggio di un mutex
@@ -183,7 +206,6 @@ void* tastroship (void* parameters){
     while (true){
         c = getch();
         //mvprintw(6,6,"okchar"); //si ferma qui -> da risolvere
-
 
         switch (c){
             case KEY_UP:
@@ -206,28 +228,36 @@ void* tastroship (void* parameters){
 
             case ' ': //Barra spaziatrice
                 pthread_mutex_lock(&tMutex);
-                //obj->hasShot = true;
+                obj->hasShot = true;
 
                 //Lancio dei due missili
-                //if (message.hasShot){}                   //Lancio dei due missili
-                // *missilesCount += 2;
+                if (obj->hasShot){                   //Lancio dei due missili
+                    *missilesCount += 2;
+                    
+
                 // // if(missiles == NULL)
                 // //     missiles = (object *)malloc(sizeof(object) * missilesCount);
                 // // else
-                // missiles = (object *)realloc(missiles, sizeof(object) * *missilesCount);
+                    missiles = (object *)realloc(missiles, sizeof(object) * *missilesCount);
 
-                // for (int i = *missilesCount - 2; i < *missilesCount; i++){    //Aggiunta dei due missili all'elenco
-                //     missiles[i].x =  astroship->x + 5;//message.x + 5; 
-                //     missiles[i].y = astroship->y + 2;//message.y + 2;
-                //     missiles[i].type = MISSILE;
-                //     missiles[i].id = i; //
-                //     //missiles[i].pid = fork();
-                //     missiles[i].tid = 0; //Dovrà essere fatto nella funzione missile!
-                //     if (missiles[i].pid == 0){
-                //         missiles[i].dir = i % 2;
-                //         tMissile(&missiles[i]);
-                //     }
-                // }
+                    for (int i = *missilesCount - 2; i < *missilesCount; i++){    //Aggiunta dei due missili all'elenco
+                        missiles[i].x =  astroship->x + 5;//message.x + 5; 
+                        missiles[i].y = astroship->y + 2;//message.y + 2;
+                        missiles[i].type = MISSILE;
+                        
+                        missiles[i].id = i; //
+                        //missiles[i].pid = fork();
+                        //missiles[i].tid = 0; //Dovrà essere fatto nella funzione missile!
+                        missiles[i].dir = i % 2;
+                        pthread_create(&missiles[i].tid, NULL, tMissile, (void *) &missiles[i]);
+                        //tMissile(&missiles[i]);
+
+                        // if (missiles[i].pid == 0){
+                        //     missiles[i].dir = i % 2;
+                        //     tMissile(&missiles[i]);
+                        // }
+                    }
+                }
                 
 
                 pthread_mutex_unlock(&tMutex);
@@ -237,46 +267,11 @@ void* tastroship (void* parameters){
             //     break;
         }
 
-
-        //o.hasShot = false;
-        //c = 'q';
-
-
-        /*int i = 100;
-        while(i > 0){
-            i--;
-            sleep(1);
-        }*/
+  
     }
     return NULL;
     //exit(0);
 }
-
-
-
-void* tEnemy1 (void* parameters){
-    object* o;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
-    o = (object*) parameters;                     //Ricorda che il cast è obbligatorio!  
-
-    //Impostiamo ogni parametro del nemico, ma in realtà dovrei usare il mutex perchè o è comunque un riferimento 
-    pthread_mutex_lock(&tMutex);
-    o->x = 10;
-    o->y = 10;       
-    o->dir = 1;    
-    o->y = rand()%30;
-    pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
-
-    bool loop = true;
-    while (loop){
-        pthread_mutex_lock(&tMutex);
-        loop = gEnemy1(o, loop);
-        pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
-        usleep(300000);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
-    }
-    //harakiri
-    pthread_exit(NULL);     //forse mettere una istruzione prima per dire che il nemico è morto?
-}
-
 
 //Missile
 void* tMissile(void* parameters){
@@ -285,22 +280,52 @@ void* tMissile(void* parameters){
 
     //Impostiamo ogni parametro del nemico, ma in realtà dovrei usare il mutex perchè o è comunque un riferimento 
     pthread_mutex_lock(&tMutex);
-    o->x = 10;
-    o->y = 10;       
-    o->dir = 1;    
-    o->y = rand()%30;
+    o->type = MISSILE;
+    // o->x = 10;
+    // o->y = 10;       
+    //o->dir = 1;    
+    //o->y = rand()%30;
     pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
 
     bool loop = true;
     while (loop){
         pthread_mutex_lock(&tMutex);
         loop = gMissile(o, loop);
+        // o->x = 10;
+        // o->y = 10;
         pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
-        usleep(300000);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
+        usleep(80000);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
     }
     //harakiri
     pthread_exit(NULL);     //forse mettere una istruzione prima per dire che il nemico è morto?
 }
+
+
+void* tEnemy1 (void* parameters){
+    object* o;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
+    o = (object*) parameters;                     //Ricorda che il cast è obbligatorio!  
+
+    //Impostiamo ogni parametro del nemico, ma in realtà dovrei usare il mutex perchè o è comunque un riferimento 
+    pthread_mutex_lock(&tMutex);
+    //o->type = ENEMY1;
+    // o->x = 10;
+    // o->y = 10;       
+    // o->dir = 1;    
+    // o->y = rand()%30;
+    // pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
+
+    // bool loop = true;
+    // while (loop){
+    //     pthread_mutex_lock(&tMutex);
+    //     loop = gEnemy1(o, loop);
+    //     pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
+    //     usleep(300000);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
+    // }
+    //harakiri
+    pthread_exit(NULL);     //forse mettere una istruzione prima per dire che il nemico è morto?
+}
+
+
 
 
 //Bombe//
@@ -384,3 +409,38 @@ void clearScreens()
         for (int x = 0; x < SCREEN_W; x++)
             mvaddch(y, x, ' ');
 }
+
+
+
+void drawScenes(
+    object *astroship,
+    //object *enemies, int enemiesCount,
+    //object *enemies2, int enemies2Count,
+    object *missiles, int missilesCount
+    //object *bombs, int bombsCount
+    )
+{
+    clearScreen();
+
+    drawObject(*astroship);
+
+    int i;
+    // for (i = 0; i < enemiesCount; i++)
+    //     if (enemies[i].state != DEAD)
+    //         drawObject(enemies[i]);
+
+    // for (i = 0; i < enemies2Count; i++)
+    //     if (enemies2[i].state != DEAD)
+    //         drawObject(enemies2[i]);
+
+    // for (i = 0; i < bombsCount; i++)
+    //     if (bombs[i].state != DEAD)
+    //         drawObject(bombs[i]);
+
+    for (i = 0; i < missilesCount; i++)
+        if (missiles[i].state != DEAD)
+            drawObject(missiles[i]);
+
+    refresh();
+}
+
