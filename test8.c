@@ -214,7 +214,7 @@ void* tastroship (void* parameters){
                     obj->y -= 1;
                     pthread_mutex_unlock(&tMutex);
                 }
-                //obj->y++;
+                //obj->y++; funziona
                 break;
 
             case KEY_DOWN:
@@ -244,6 +244,7 @@ void* tastroship (void* parameters){
                         missiles[i].x =  astroship->x + 5;//message.x + 5; 
                         missiles[i].y = astroship->y + 2;//message.y + 2;
                         missiles[i].type = MISSILE;
+                        missiles[i].state = INITIALIZED;
                         
                         missiles[i].id = i; //
                         //missiles[i].pid = fork();
@@ -265,6 +266,14 @@ void* tastroship (void* parameters){
 
             // default:
             //     break;
+        }//Fine switch
+
+        //Controlliamo per missili morti da ammazzare
+        int i;
+        for(i = 0; i < *missilesCount; i++ ){
+            if(missiles[i].state == DEAD)
+                pthread_join(missiles[i].tid, NULL);
+                missiles[i].state = KILLED;
         }
 
   
@@ -294,10 +303,11 @@ void* tMissile(void* parameters){
         // o->x = 10;
         // o->y = 10;
         pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
-        usleep(80000);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
+        usleep(200000);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
     }
     //harakiri
-    pthread_exit(NULL);     //forse mettere una istruzione prima per dire che il nemico è morto?
+    pthread_cancel(o->tid);
+    //pthread_exit(NULL);     //forse mettere una istruzione prima per dire che il nemico è morto?
 }
 
 
