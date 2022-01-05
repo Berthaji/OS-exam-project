@@ -801,12 +801,8 @@ int statusConditions(bool life,
     if(life < 1)
         status = 3;
 
-
-
     //3.  nelle condizioni, se almeno un nemico arriva a bordo schermo, allora loop == false e status == 2
-
     // arrivare a abordo schermo => ciclo su coordinate dei nemici (x < 0 e  0 < y > DIMSCHERMO )
-    
     for (i = 0; i < enemies1Count; i++)
         if (enemies1[i].x < 1 && enemies1[i].y > 0 && enemies1[i].y < SCREEN_H)
             status = 2;//status = i + 100;
@@ -814,12 +810,10 @@ int statusConditions(bool life,
         if (enemies2[i].x < 1 && enemies2[i].y > 0 && enemies2[i].y < SCREEN_H)
             status = 2; //status = i + 1000000;
 
-           
         //Status = -1 => si gioca ancora
         //Status = 0 => 
         //Status = 1 => si esce dal gioco come vincitori
         //Status = 2 => si esce perdenti (navicelle a sx)
         //Status = 3 => si esce perdenti (life == 0)
-
     return status;
 }

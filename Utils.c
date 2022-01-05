@@ -2,7 +2,7 @@
 
 #include <ncurses.h>
 
-
+//$$ Da eliminare
 bool HasEnemyCollided(object enemy, object* missiles, int missilesCount){
     for(int i = 0; i < missilesCount; i++){
         if( 
@@ -26,7 +26,7 @@ bool HasEnemyCollided(object enemy, object* missiles, int missilesCount){
 int MissileCollided(object* enemy, object missiles, int enemiesCount){
     for(int i = 0; i < enemiesCount; i++){
         if( range(enemy[i].x, enemy[i].x +3 , missiles.x) &&
-            range(enemy[i].y, enemy[i].y +3 , missiles.y)
+            range(enemy[i].y, enemy[i].y +3 , missiles.y)       //$$ 3 e 3 sono parametri della dimensione da dare con define
             ){
                 return i;    
             }

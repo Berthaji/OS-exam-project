@@ -47,5 +47,5 @@ sus4:
 	./test1
 
 sus8:
-	gcc test8.c Scene.c -o test8 -lncurses -lpthread -std=c99
+	gcc test8.c Scene.c Utils.c -o test8 -lncurses -lpthread -std=c99
 	./test8
