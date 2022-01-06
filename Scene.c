@@ -159,7 +159,7 @@ void drawScene(
 
     int i;
     for (i = 0; i < enemiesCount; i++)
-        if (enemies[i].state != DEAD)
+        if (enemies[i].state != DEAD && enemies[i].state != KILLED)
             drawObject(enemies[i]);
 
     for (i = 0; i < enemies2Count; i++)
@@ -265,8 +265,15 @@ void gameLose(){
 
 //Da rivedere...
 bool gEnemy1(object * o, bool bo){
-    o->y += -1;
-    o->x = 10;
+
+
+    o->x--;                   //sposto il nemico verso destra
+    //o->y += 0;               //Si spostano nello stesso modo
+    o->y += o->dir ? -1 : 1; //sposto il nemico in basso o in alto a seconda della sua direzione
+    //pthread_mutex_unlock(&tMutex);
+
+    //o.dir == 0 --> 1
+    //o.dir == 1 --> -1
 
     /**
      * se il nemico è fuori dallo schermo dobbiamo terminare il processo
@@ -276,19 +283,49 @@ bool gEnemy1(object * o, bool bo){
 
     //se il nemico non è ai bordi si può muovere tranquillamente, altrimenti lo spostiamo più dentro
     if (o->y >= SCREEN_H -2){    //Bordo inferiore superato
-        o->y = o->y--;
+        //pthread_mutex_lock(&tMutex);
+        o->y--;
         o->dir = 1;
+        //pthread_mutex_unlock(&tMutex);
     }
+
     if (o->y <= 0 ){    //Bordo superiore superato
-        o->y = o->y++;
+        //pthread_mutex_lock(&tMutex);
+        o->y++;
         o->dir = 0;
+        //pthread_mutex_unlock(&tMutex);
     }
 
     if (o->x < -5){
         bo = false;
-        o->state = KILLED;
+        //pthread_mutex_lock(&tMutex);
+        o->state = DEAD;
     }
-    return bo;
+
+    // o->y += -1;
+    // o->x = 10;
+
+    // /**
+    //  * se il nemico è fuori dallo schermo dobbiamo terminare il processo
+    //  * perciò terminiamo il loop, comunichiamo al processo principale che il nemico 
+    //  * è "morto" e chiudiamo il processo nemico
+    //  */
+
+    // //se il nemico non è ai bordi si può muovere tranquillamente, altrimenti lo spostiamo più dentro
+    // if (o->y >= SCREEN_H -2){    //Bordo inferiore superato
+    //     o->y = o->y--;
+    //     o->dir = 1;
+    // }
+    // if (o->y <= 0 ){    //Bordo superiore superato
+    //     o->y = o->y++;
+    //     o->dir = 0;
+    // }
+
+    // if (o->x < -5){
+    //     bo = false;
+    //     o->state = KILLED;
+    // }
+    // return bo;
 }
 
 
@@ -315,8 +352,60 @@ bool gMissile(object * o, bool bo){
         o->state = DEAD;
     }
 
+    if (o->state == DEAD){
+        bo = false;
+        o->state = DEAD;
+    }
+
+    if (o->x < -5){
+        bo = false;
+        o->state = KILLED;
+    }
+
     return bo;        
 }
 
+
+bool gEnemy2(object * o, bool bo){
+
+    //o.dir = direction;
+
+    //o.dir = direction;
+
+    o->x--;                   //sposto il nemico verso destra
+    o->y += 0;               //Si spostano nello stesso modo
+    //o.y += o.dir ? -1 : 1; //sposto il nemico in basso o in alto a seconda della sua direzione
+
+    //o.dir == 0 --> 1
+    //o.dir == 1 --> -1
+
+    /**
+     * se il nemico è fuori dallo schermo dobbiamo terminare il processo
+     * perciò terminiamo il loop, comunichiamo al processo principale che il nemico 
+     * è "morto" e chiudiamo il processo nemico
+     */
+
+    //se il nemico non è ai bordi si può muovere tranquillamente, altrimenti lo spostiamo più dentro
+    
+    if (o->y >= SCREEN_H -2){    //Bordo inferiore superato
+        o->y = o->y--;
+        o->dir = 1;
+    }
+
+    if (o->y <= 0 ){    //Bordo superiore superato
+        o->y = o->y++;
+        o->dir = 0;
+    }
+
+    if (o->x < -5){
+        bo = false;
+        o->state = DEAD;
+    }
+
+
+
+    //o.dir = direction;
+
+}
 
 

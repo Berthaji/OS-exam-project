@@ -521,7 +521,7 @@ void pEngine(int life, int enemiesdim, int shotProb){
                             enemies2[i].type = ENEMY2;
                             enemies2[i].appearance = 3;
                             enemies2[i].id = i;
-                            enemies2[i].pid = fork();
+                            enemies2[i].pid = fork();       
                             if (enemies2[i].pid == 0){
                                 enemies2[i].dir = 0;
                                 pEnemy2(pipeOut, enemies2[i]);

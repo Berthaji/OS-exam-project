@@ -9,12 +9,13 @@ int main()
 {
     missilesCount =  (int*) malloc (sizeof(int) * 1);
 
-    *missilesCount = 100;
+    *missilesCount = -5;
+
 
     while(true){
         sleep(1);
-        *missilesCount += 2;
         printf("%d\n", *missilesCount);
+        *missilesCount += 1;
     }
 
     return 0;

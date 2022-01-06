@@ -32,6 +32,34 @@ fix:
 	stty sane
 	stty sane
 	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
+	stty sane
 	clear
 
 sus2: 
