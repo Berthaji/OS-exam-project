@@ -1,4 +1,4 @@
-#pragma once
+//#pragma once
 
 
 #include <signal.h>
@@ -16,6 +16,8 @@
 
 #include "Scene.h"
 #include "Utils.h"
+
+
 // void player();
 // void game();
 // void enemy();
@@ -34,7 +36,9 @@ void pEnemy1(int pipeOut, object o);
 void pEnemy2(int pipeOut, object o);
 void pBomb(int pipeOut, object o);
 void pMissile(int pipeOut, object o);
-void pEngine(int life);
+//void pEngine(int life);
+void pEngine(int life, int enemiesdim, int shotProb);
+
 
 void pEnd( 
     object *astroship,

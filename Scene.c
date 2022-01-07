@@ -296,36 +296,15 @@ bool gEnemy1(object * o, bool bo){
         //pthread_mutex_unlock(&tMutex);
     }
 
-    if (o->x < -5){
+    if (o->x < 0){
         bo = false;
+       
         //pthread_mutex_lock(&tMutex);
         o->state = DEAD;
     }
 
-    // o->y += -1;
-    // o->x = 10;
-
-    // /**
-    //  * se il nemico è fuori dallo schermo dobbiamo terminare il processo
-    //  * perciò terminiamo il loop, comunichiamo al processo principale che il nemico 
-    //  * è "morto" e chiudiamo il processo nemico
-    //  */
-
-    // //se il nemico non è ai bordi si può muovere tranquillamente, altrimenti lo spostiamo più dentro
-    // if (o->y >= SCREEN_H -2){    //Bordo inferiore superato
-    //     o->y = o->y--;
-    //     o->dir = 1;
-    // }
-    // if (o->y <= 0 ){    //Bordo superiore superato
-    //     o->y = o->y++;
-    //     o->dir = 0;
-    // }
-
-    // if (o->x < -5){
-    //     bo = false;
-    //     o->state = KILLED;
-    // }
-    // return bo;
+    
+    return bo;
 }
 
 
@@ -354,10 +333,10 @@ bool gMissile(object * o, bool bo){
 
     if (o->state == DEAD){
         bo = false;
-        o->state = DEAD;
+        o->state = DEAD;  //$$ ??
     }
 
-    if (o->x < -5){
+    if (o->x < 0){
         bo = false;
         o->state = KILLED;
     }
@@ -388,24 +367,48 @@ bool gEnemy2(object * o, bool bo){
     //se il nemico non è ai bordi si può muovere tranquillamente, altrimenti lo spostiamo più dentro
     
     if (o->y >= SCREEN_H -2){    //Bordo inferiore superato
-        o->y = o->y--;
+        //o->y = o->y--;
+        o->y--;
         o->dir = 1;
     }
 
     if (o->y <= 0 ){    //Bordo superiore superato
-        o->y = o->y++;
+        //o->y = o->y++;
+        o->y++;
         o->dir = 0;
     }
 
-    if (o->x < -5){
+    if (o->x < 0){
         bo = false;
         o->state = DEAD;
     }
 
 
-
+    return bo;
     //o.dir = direction;
 
 }
 
+
+bool gBomb(object * o, bool bo){
+    //bool test = bo;
+    o->x--;                     //sposto la bomba verso sinistra
+    //o->y += 0;
+    /**
+     * se il missile è fuori dallo schermo dobbiamo terminare il processo
+     * perciò terminiamo il loop, comunichiamo al processo principale che il proiettile 
+     * è "morto" e chiudiamo il processo missile
+     */
+    if (o->x < 0){
+        bo = false;
+        o->state = DEAD;
+    }
+
+    if (o->state == DEAD){
+        bo = false;
+        //o->state = DEAD;  //$$ ??
+    }
+
+    return bo;
+}
 

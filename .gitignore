@@ -16,5 +16,9 @@ test3
 test3.c
 test4
 test4.c
+test6
+test6.c
+test7vc
+test7vc.c
 gioco
 .vscode/c_cpp_properties.json

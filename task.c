@@ -1,5 +1,5 @@
 /**
- * @file task.c
+ * @file task.c  $$
  * @author Concas Filippo (f.concas24@studenti.unica.it)
  * @brief Manage the game in both process and thread versions
  * @version 0.1
@@ -10,6 +10,8 @@
  */
 
 #include "task.h"
+
+
 
 /**
  * @brief pAstroship è la funzione che gestisce il player
@@ -53,7 +55,7 @@ void pAstroship(int pipeOut, object o){
                 break;
         }
         //Scrivo solo se ho sparato o mi sono mosso, cosi risparmio sull'uso della pipe
-        if(o.hasShot || c != 'q')
+        if(o.hasShot || c != 'q')  //$$ trovare soluzione migliori
             write(pipeOut, &o, sizeof(o)); /* Comunico al processo padre le coordinate del contadino */
         
         
@@ -770,6 +772,9 @@ void pPID(
         j++;
         mvprintw(j,0, "PID MS: %d - STATE: %d", missiles[i].pid, missiles[i].state);
     }
+    j++;
+    mvprintw(j,0, "fs[0]: %d, fs[1]: %d", fs[0], fs[1]);
+
 
     refresh();
     sleep(1);

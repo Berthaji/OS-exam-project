@@ -75,5 +75,10 @@ sus4:
 	./test1
 
 sus8:
-	gcc test8.c Scene.c Utils.c -o test8 -lncurses -lpthread -std=c99
+	gcc test8.c task.c Scene.c Utils.c  -o test8 -lncurses -lpthread
 	./test8
+
+sus8d:
+	gcc test8.c task.c Scene.c Utils.c  -o test8 -lncurses -lpthread -Wall -Wextra -g
+
+
