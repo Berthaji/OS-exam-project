@@ -309,7 +309,8 @@ void pEngine(int life, int enemiesdim, int shotProb){
         //Generazione dei nemici di primo livello (Stesso aspetto per tutti i nemici)
         
         int enemyappereace = rand()% (ENEMYDCHOICE -1); //L'ultimo aspetto è riservato ai nemici di secondo livello
-        for (int i = 0, x = 0, y = 1; i < enemies1Count; i++){
+        int i,x,y;
+        for (i = 0, x = 0, y = 1; i < enemies1Count; i++){
             enemies1[i].type = ENEMY1;
             enemies1[i].appearance = enemyappereace;
             enemies1[i].id = i;
@@ -357,8 +358,8 @@ void pEngine(int life, int enemiesdim, int shotProb){
                     //     missiles = (object *)malloc(sizeof(object) * missilesCount);
                     // else
                     missiles = (object *)realloc(missiles, sizeof(object) * missilesCount);
-
-                    for (int i = missilesCount - 2; i < missilesCount; i++){    //Aggiunta dei due missili all'elenco
+                    int i;
+                    for (i = missilesCount - 2; i < missilesCount; i++){    //Aggiunta dei due missili all'elenco
                         missiles[i].x = message.x + 5; 
                         missiles[i].y = message.y + 2;
                         missiles[i].type = MISSILE;
@@ -390,8 +391,8 @@ void pEngine(int life, int enemiesdim, int shotProb){
                     bombsCount ++;
 
                     bombs = (object *)realloc(bombs, sizeof(object) * bombsCount);
-
-                    for (int i = bombsCount - 1; i < bombsCount; i++){
+                    int i;
+                    for (i = bombsCount - 1; i < bombsCount; i++){
                         bombs[i].x = message.x - 1; 
                         bombs[i].y = message.y + 1;
                         bombs[i].type = BOMB;
@@ -516,8 +517,8 @@ void pEngine(int life, int enemiesdim, int shotProb){
                         doubleMissile = (bool *)realloc(doubleMissile, sizeof(bool) * missile2Count);
                         doubleMissile[missile2Count] = false;
 
-
-                        for (int i = enemies2Count - 1; i < enemies2Count; i++){
+                        int i;
+                        for (i = enemies2Count - 1; i < enemies2Count; i++){
                             enemies2[i].x = enemies1[enemyid].x-1; //message.x; 
                             enemies2[i].y = enemies1[enemyid].y; //message.y; 
                             enemies2[i].type = ENEMY2;
@@ -596,8 +597,8 @@ void pEngine(int life, int enemiesdim, int shotProb){
                         bombsCount += 1;
 
                         bombs = (object *)realloc(bombs, sizeof(object) * bombsCount);
-
-                        for (int i = bombsCount - 1; i < bombsCount; i++){
+                        int i;
+                        for (i = bombsCount - 1; i < bombsCount; i++){
                             bombs[i].x = message.x - 1; 
                             bombs[i].y = message.y + 1;
                             bombs[i].type = BOMB;
@@ -790,11 +791,11 @@ int statusConditions(bool life,
     bool enemiesDead = false;//true;           
     int i;
     for (i = 0; i < enemies1Count; i++)
-        if (!(enemies1[i].state == DEAD))
+        if (enemies1[i].state == INITIALIZED) //nuova condizione da aggiungere //!(enemies1[i].state == DEAD )
             enemiesDead = true;
 
     for (i = 0; i < enemies2Count; i++)
-        if (!(enemies2[i].state == DEAD))
+        if (enemies2[i].state == INITIALIZED)
             enemiesDead = true;
 
 

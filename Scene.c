@@ -109,10 +109,10 @@ char lose[14][121+1] = {
  * @brief Replaces every character on the screen with a whitespace
  * 
  */
-void clearScreen()
-{
-    for (int y = 0; y < SCREEN_H; y++)
-        for (int x = 0; x < SCREEN_W; x++)
+void clearScreen(){
+    int y, x;
+    for (y = 0; y < SCREEN_H; y++)
+        for (x = 0; x < SCREEN_W; x++)
             mvaddch(y, x, ' ');
 }
 
@@ -187,19 +187,22 @@ void drawObject(object entity){
 
     switch (entity.type){
         case ASTROSHIP:{
-            for (int j = 0; j < ASTRODIM; j++)
+            int j;
+            for (j = 0; j < ASTRODIM; j++)
                 mvprintw(entity.y + j, entity.x, astroship_sprites[entity.appearance][j]);
             break;
         }
 
         case ENEMY1:{
-            for (int j = 0; j < ENEMYDIM; j++)
+            int j;
+            for (j = 0; j < ENEMYDIM; j++)
                 mvprintw(entity.y + j, entity.x, enemy_sprites[entity.appearance][j]);
             break;
         }
 
         case ENEMY2:{
-            for (int j = 0; j < ENEMYDIM; j++)
+            int j;
+            for (j = 0; j < ENEMYDIM; j++)
                 mvprintw(entity.y + j, entity.x, enemy_sprites[3][j]);
             break;
         }
@@ -311,8 +314,8 @@ bool gEnemy1(object * o, bool bo){
 bool gMissile(object * o, bool bo){
     
     o->x++;                     //sposto il missile verso destra 
-    o->y += (o->dir ? -1 : 1)*0.625;      //$$diagonale vera - //sposto il missile in basso o in alto a seconda della sua direzione
-
+    //o->y += (o->dir ? -1 : 1)*0.625;      //$$diagonale vera - //sposto il missile in basso o in alto a seconda della sua direzione
+    o->y += (o->dir ? -1 : 1)*0.05;  
 
     /**
      * se il missile è fuori dallo schermo dobbiamo terminare il processo
