@@ -306,6 +306,11 @@ bool gEnemy1(object * o, bool bo){
         o->state = DEAD;
     }
 
+    if (o->state == DEAD){      //Serve per quando la modificano al'esternod ella funzione tBonb
+        bo = false;
+        //o->state = DEAD;  //$$ ??
+    }
+
     
     return bo;
 }
@@ -336,13 +341,13 @@ bool gMissile(object * o, bool bo){
 
     if (o->state == DEAD){
         bo = false;
-        o->state = DEAD;  //$$ ??
+        //o->state = DEAD;  //$$ ??
     }
 
-    if (o->x < 0){
-        bo = false;
-        o->state = KILLED;
-    }
+    
+
+
+    
 
     return bo;        
 }
@@ -386,6 +391,11 @@ bool gEnemy2(object * o, bool bo){
         o->state = DEAD;
     }
 
+    if (o->state == DEAD){      //Serve per quando la modificano al'esternod ella funzione tBonb
+        bo = false;
+        //o->state = DEAD;  //$$ ??
+    }
+
 
     return bo;
     //o.dir = direction;
@@ -407,8 +417,10 @@ bool gBomb(object * o, bool bo){
         o->state = DEAD;
     }
 
-    if (o->state == DEAD){
+    if (o->state == DEAD){      //Serve per quando la modificano al'esternod ella funzione tBonb
         bo = false;
+        o->x = -1;
+        o->y = -1;
         //o->state = DEAD;  //$$ ??
     }
 

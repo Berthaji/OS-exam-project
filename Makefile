@@ -81,4 +81,15 @@ sus8:
 sus8d:
 	gcc test8.c task.c Scene.c Utils.c  -o test8 -lncurses -lpthread -Wall -Wextra -g -std=gnu90
 
+sus10:
+	gcc test10.c task.c Scene.c Utils.c  -o test10 -lncurses -lpthread
+	./test10
+
+sus11:
+	gcc test11.c task.c Scene.c Utils.c  -o test11 -lncurses -lpthread
+	./test11
+
+sus11d:
+	gcc test11.c task.c Scene.c Utils.c  -o test11 -lncurses -lpthread -Wall -Wextra -g
+
 
