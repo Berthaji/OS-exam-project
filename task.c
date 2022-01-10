@@ -351,13 +351,29 @@ void pEngine(int life, int enemiesdim, int shotProb){
         //in questo switch va gestita la logica del gioco
         switch (message.type){
             case ASTROSHIP:{
+                
+                bool conditions = false;
+                if(missilesShooted == false){
+                    //Non sono mai stati sparati missili: ha senso farli sparare
+                    conditions = true;
+                    missilesShooted = true;
+                }
+                else{ //Non  è la prima votla che si spara: vediamo se i precedenti sono morti
+                     if(missiles[missilesCount-1].state == DEAD 
+                        && missiles[missilesCount-2].state == DEAD){
+                         conditions = true;
+                     }
+                }
+                conditions = conditions && message.hasShot;
+
+
                 astroship->type = message.type;
                 astroship->x = message.x;
                 astroship->y = message.y;
                 astroship->appearance = message.appearance;
                 
                 //Lancio dei due missili
-                if (message.hasShot){                   //Lancio dei due missili
+                if (conditions){//(message.hasShot){                   //Lancio dei due missili
                     missilesCount += 2;
                     // if(missiles == NULL)
                     //     missiles = (object *)malloc(sizeof(object) * missilesCount);
@@ -369,6 +385,7 @@ void pEngine(int life, int enemiesdim, int shotProb){
                         missiles[i].y = message.y + 2;
                         missiles[i].type = MISSILE;
                         missiles[i].id = i;
+                        missiles[i].state = INITIALIZED;
                         missiles[i].pid = fork();
                         if (missiles[i].pid == 0){
                             missiles[i].dir = i % 2;
@@ -498,20 +515,21 @@ void pEngine(int life, int enemiesdim, int shotProb){
             }
             
             case MISSILE:{
-                bool conditions = false;
-                if(missilesShooted == false){
-                    //Non sono mai stati sparati missili: ha senso farli sparare
-                    conditions = true;
-                }
-                else{ //Non  è la prima votla che si spara: vediamo se i precedenti sono morti
-                     if(missiles[missile2Count-1].state == DEAD 
-                        && missiles[missile2Count-2].state == DEAD){
-                         conditions = true;
-                     }
-                }
-                //conditions = false;
-                if(conditions){
+                
+                // if(missilesShooted == false){
+                //     //Non sono mai stati sparati missili: ha senso farli sparare
+                //     conditions = true;
+                // }
+                // else{ //Non  è la prima votla che si spara: vediamo se i precedenti sono morti
+                //      if(missiles[missilesCount-1].state == DEAD 
+                //         && missiles[missilesCount-2].state == DEAD){
+                //          conditions = true;
+                //      }
+                // }
+                bool conditionss = true; //$$$$
+                //if(conditionss){
                     //Lancia i missili
+                    
                     int id = message.id;
                     missiles[id].x = message.x;
                     missiles[id].y = message.y;
@@ -600,7 +618,7 @@ void pEngine(int life, int enemiesdim, int shotProb){
                     if (message.state == DEAD){
                         missiles[id].pid = -1;
                     }
-                }
+                //}
                 break;
             }
 
@@ -701,8 +719,8 @@ void pEngine(int life, int enemiesdim, int shotProb){
         drawScene(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);
         mvprintw(0,0, "VITE: %d - STATUS: %d , c %d", life, status, enemies1Count);
 
-        for(int ii = 0; ii < enemies1Count;  ii++){
-            mvprintw(10 + ii,50, "STATUS NEMICO1: %d", enemies1[ii].state);
+        for(int ii = 0; ii < missilesCount;  ii++){
+            mvprintw(10 + ii,50, "STATUS: %d, ID: %d ID:%d. ID:%d", missiles[missilesCount].state,  missiles[missilesCount-1].state, missiles[missilesCount-2].state);
         }
 
         refresh();
