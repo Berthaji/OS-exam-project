@@ -46,7 +46,7 @@ int main(){
     //...
 
     //motore di gioco basato su processi
-    pEngine(3);
+    pEngine(3,3,10);
     
     refresh();
     sleep(3);
