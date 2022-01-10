@@ -189,12 +189,13 @@ int main(){
     for(i = 0; i < 2; i++){
         pthread_mutex_lock(&tMutex); 
 
-        missi
-        bombs[i].state = NOT_INITIALIZED;
-        bombs[i].type = BOMB;
-        bombs[i].x = -1;
-        bombs[i].x = -1;  
-        pthread_create(&(bombs[i].tid), NULL, tBombe2, (void*)(&bombs[i]));
+        missiles[i].type = MISSILE;
+        missiles[i].state = NOT_INITIALIZED;
+        missiles[i].x = -1;
+        missiles[i].y = -1;
+        
+
+        pthread_create(&(missiles[i].tid), NULL, tMissile, (void*)(&missiles[i]));
             
         pthread_mutex_unlock(&tMutex);   
     }
