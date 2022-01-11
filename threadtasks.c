@@ -1,91 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-#include <stdbool.h>
-#include <time.h>
-#include <signal.h>
-#include <time.h>
-#include <pthread.h>
-#include <stdio.h>
-
-#include <signal.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-//#include <termios.h>
-#include <ncurses.h>
-
-#include <pthread.h>
-
-#include "task.h"
-#include "Scene.h"
-
-
-//Define PERSONALI
-#define SCREEN_W getmaxx(stdscr)
-#define SCREEN_H getmaxy(stdscr)
-
-Object * astroship;
-Object * enemies1;
-Object * enemies2;
-Object * missiles;
-Object * bombs;
-int *doubleMissile;      //Array per contenere il fatto che il nemico di secondo livello sia stato attaccato 2 volte
-
-int* missilesCount;      //Contatore numero di missili
-int* enemies1Count;                                  
-int* enemies2Count;
-int* bombsCount;
-
-int* missile2Count;    //$$ da togliere?
-
-
-int* status;
-int* life;
-
-pthread_mutex_t tMutex; 
-
-void* tastroship (void* parameters);
-void* tEnemy1 (void* parameters);
-void* tEnemy2(void* parameters);
-void* tBombe(void* parameters);
-void* tMissile(void* parameters);
-
-void* tBombe2(void* parameters);
-
-void drawScenes(
-    // Object *astroship,
-    // Object *enemies, int enemiesCount,
-    // Object *enemies2, int enemies2Count,
-    // Object *missiles, int missilesCount,
-    // Object *bombs, int bombsCount
-    );
-
-int statusConditionsThread(bool life,
-    Object *enemies1, int enemies1Count,
-    Object *enemies2, int enemies2Count);
-
-void tEnd(int i);
-
-
-bool ttenemy(Object * o, bool bo);
-
-
-void myInitScreen();
-void clearScreens();
-
-void checkCollision();
+#include "threadtasks.h"
 
 
 
-int main(){
 
-    srand(time(NULL));
-    myInitScreen();
+
+
+
+
+int mains(){
+
+    
+    //myInitScreen();
     clearScreens();
 
     
@@ -702,7 +627,49 @@ void* tEnemy1 (void* parameters){
         //SPOSTATO IN AREAGIOCO $$
         //Forse ci sta un altro blocco/sblocco mutex $$
 
-        loop = gEnemy1(o, loop);
+        //loop = gEnemy1(o, loop);
+        //
+        o->x--;                   //sposto il nemico verso destra
+        //o->y += 0;               //Si spostano nello stesso modo
+        o->y += o->dir ? -1 : 1; //sposto il nemico in basso o in alto a seconda della sua direzione
+        //pthread_mutex_unlock(&tMutex);
+
+        //o.dir == 0 --> 1
+        //o.dir == 1 --> -1
+
+        /**
+         * se il nemico è fuori dallo schermo dobbiamo terminare il processo
+         * perciò terminiamo il loop, comunichiamo al processo principale che il nemico 
+         * è "morto" e chiudiamo il processo nemico
+         */
+
+        //se il nemico non è ai bordi si può muovere tranquillamente, altrimenti lo spostiamo più dentro
+        if (o->y >= SCREEN_H -2){    //Bordo inferiore superato
+            //pthread_mutex_lock(&tMutex);
+            o->y--;
+            o->dir = 1;
+            //pthread_mutex_unlock(&tMutex);
+        }
+
+        if (o->y <= 0 ){    //Bordo superiore superato
+            //pthread_mutex_lock(&tMutex);
+            o->y++;
+            o->dir = 0;
+            //pthread_mutex_unlock(&tMutex);
+        }
+
+        if (o->x < 0){
+            loop = false;
+        
+            //pthread_mutex_lock(&tMutex);
+            o->state = DEAD;
+        }
+
+        if (o->state == DEAD){      //Serve per quando la modificano al'esternod ella funzione tBonb
+            loop = false;
+            //o->state = DEAD;  //$$ ??
+        }
+        //
         pthread_mutex_unlock(&tMutex);
 
         usleep(600000);
@@ -1240,7 +1207,7 @@ void checkCollision(){
     for(i = 0; i < *enemies1Count; i++){
         //$$ cambiare + 3 e +5 con le macro
         //pthread_mutex_lock(&tMutex); 
-        int shoting = AstroCollided(*astroship,bombs[i]);
+        int shoting = astroCollided(*astroship,bombs[i]);
 
         // if( range(astroship->x, astroship->x +5 , bombs[i].x) &&
         //     range(astroship->y, astroship->y +5 , bombs[i].y)       //$$ 3 e 3 sono parametri della dimensione da dare con define

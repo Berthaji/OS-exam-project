@@ -1,9 +1,12 @@
 
 #include "scene.h"
 #include "processtasks.h"
+#include "threadtasks.h"
 
 
 int main(){
+    srand(time(NULL));
+
     initScreen();
 
     /* Visualizzazione della splash screen */       
@@ -22,7 +25,8 @@ int main(){
             break;
 
         case 1: /* Media */
-            
+             
+            mains();
             break;
 
         case 2: /* Difficile */
