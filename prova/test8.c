@@ -441,7 +441,9 @@ int main(){
     }
 
     // //Abbozzo di tEnd
-    //tEnd(1);
+    tEnd(*enemies1Count);
+
+    //sleep(15);
     
     
     endwin();
@@ -461,6 +463,9 @@ void* tastroship (void* parameters){
     obj->type = ASTROSHIP;
     obj->appearance = 2;
     obj->hasShot = false;
+
+    obj->pid = getpid();
+
     obj->x = 6;
     obj->y = 1;
     //Mettere gli altri parametri $$
@@ -579,8 +584,8 @@ void* tMissile(void* parameters){
     // //o->y = rand()%30;
     // pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
 
-    bool loop = true;
-   // while (loop){
+    //bool loop = true;
+     // while (loop){
         // pthread_mutex_lock(&tMutex);
         //loop = gMissile(o, loop);
         // // o->x = 10;
@@ -589,9 +594,9 @@ void* tMissile(void* parameters){
         //
 
         //
-        while(o->state != KILLED){
-        
-            while(o->state == INITIALIZED){
+    while(o->state != KILLED){
+    
+        while(o->state == INITIALIZED){
                 pthread_mutex_lock(&tMutex);
 
                 //Collisione col nemico di secondo livello
@@ -931,9 +936,41 @@ void* tEnemy2(void* parameters){
 
 //Bisogna reinserire tutti i precedenti parametri della pEnd
 void tEnd(int i){
-    for(i = 0; i < 1; i++){
-        //pthread_join (thread_id[i], NULL);
-    }
+
+    mvprintw(0,0,"PID: %d", astroship->pid);
+    refresh();
+    pthread_cancel(astroship->tid);
+    pthread_join(astroship->tid, NULL);
+    // for(i = 0; i < 1; i++){
+    //     pthread_cancel(missiles[i].tid);
+    //     pthread_join (missiles[i].tid, NULL);
+    //     pthread_cancel(bombs[i].tid);
+    //     pthread_join (bombs[i].tid, NULL);
+    //     pthread_cancel(enemies1[i].tid);
+    //     pthread_join (enemies1[i].tid, NULL);
+    //     pthread_cancel(enemies2[i].tid);
+    //     pthread_join (enemies2[i].tid, NULL);
+    // }
+
+    //free
+    free(astroship);
+    free(enemies1);
+    free(missiles);
+    free(bombs);
+    free(enemies2);
+
+    free(doubleMissile);
+    free(missilesCount);
+    free(enemies1Count);
+    free(enemies2Count);
+    free(bombsCount);
+    free(missile2Count);
+    free(status);
+    free(life);
+
+    
+    
+    sleep(6);
 }
 
 
@@ -1014,7 +1051,7 @@ void drawScenes(
 
     //pthread_mutex_unlock(&tMutex);
     //Contatore vite
-    mvprintw(0,0, "VITE: %d, STATUS: %d, RAND: %d", *life, *status, rand()%100);
+    mvprintw(0,0, "VITE: %d , STATUS: %d, RAND: %d", *life, *status, rand()%100);
 
 
     //

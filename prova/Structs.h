@@ -13,8 +13,11 @@ typedef struct Point{
     int y;
 } Point;
 
-//Structure of any object in the game
-typedef struct object{
+/**
+ * @brief Struttura di ogni oggetto nel gioco
+ * 
+ */
+typedef struct Object{
     int x;
     float y;
     
@@ -24,14 +27,11 @@ typedef struct object{
     TYPE type;                  //tipo entità
     STATE state;                //stato oggetto
     int appearance;             //Aspetto degli oggetti (usato da astronave e nemici)
-                                //$$ -1 indica l'essere una bomba o un missile per ora
 
     int dir;                    //Direzione dell'oggetto (usato solo dai nemici)
-    int invmov;                 //Inversione del movimento (per lo scontro tra nemici) $$deprecata, da togliere
+    //int invmov;                 //Inversione del movimento (per lo scontro tra nemici) $$deprecata, da togliere
 
     pid_t pid;                  //Process id
-    pthread_t tid;    //Thread id
+    pthread_t tid;              //Thread id
+}Object;
 
-    
-}object;
-//Sarebbe Object

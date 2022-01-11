@@ -138,20 +138,23 @@ void initScreen()
     init_pair(7, COLOR_RED, COLOR_BLACK);     /* Colore per cancellare */
     init_pair(8, COLOR_YELLOW, COLOR_BLACK);  /* Colore per cancellare */
 
+    init_color(9,250,250,250);
+    init_pair(9,1,COLOR_BLACK);
+
   //  attron(COLOR_PAIR(8));
     // attroff(COLOR_PAIR(8));
 }
 
 /**
- * @brief Drawing objects in the scene
+ * @brief Funzione per il disegno degli oggetti nella scena
  * 
  */
 void drawScene(
-    object *astroship,
-    object *enemies, int enemiesCount,
-    object *enemies2, int enemies2Count,
-    object *missiles, int missilesCount,
-    object *bombs, int bombsCount)
+    Object *astroship,
+    Object *enemies, int enemiesCount,
+    Object *enemies2, int enemies2Count,
+    Object *missiles, int missilesCount,
+    Object *bombs, int bombsCount)
 {
     clearScreen();
 
@@ -182,8 +185,7 @@ void drawScene(
  * 
  * @param entity Oggetto da disegnare
  */
-void drawObject(object entity){
-    //attron(COLOR_PAIR(entity.color)); //Colore del singolo oggetto
+void drawObject(Object entity){
 
     switch (entity.type){
         case ASTROSHIP:{
@@ -267,7 +269,7 @@ void gameLose(){
 //-- Funzioni comuni sia alla processi thread che alla versione  --//
 
 //Da rivedere...
-bool gEnemy1(object * o, bool bo){
+bool gEnemy1(Object * o, bool bo){
 
 
     o->x--;                   //sposto il nemico verso destra
@@ -316,7 +318,7 @@ bool gEnemy1(object * o, bool bo){
 }
 
 
-bool gMissile(object * o, bool bo){
+bool gMissile(Object * o, bool bo){
     
     o->x++;                     //sposto il missile verso destra 
     //o->y += (o->dir ? -1 : 1)*0.625;      //$$diagonale vera - //sposto il missile in basso o in alto a seconda della sua direzione
@@ -353,7 +355,7 @@ bool gMissile(object * o, bool bo){
 }
 
 
-bool gEnemy2(object * o, bool bo){
+bool gEnemy2(Object * o, bool bo){
 
     //o.dir = direction;
 
@@ -403,7 +405,7 @@ bool gEnemy2(object * o, bool bo){
 }
 
 
-bool gBomb(object * o, bool bo){
+bool gBomb(Object * o, bool bo){
     //bool test = bo;
     o->x--;                     //sposto la bomba verso sinistra
     //o->y += 0;

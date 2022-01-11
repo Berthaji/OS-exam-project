@@ -1,0 +1,28 @@
+
+
+
+main.c
+
+scene.c
+    -   d
+scene.h
+
+processtasks.c
+processtasks.h
+
+threadtasks.c
+threadtasks.h
+
+Makefile
+
+
+
+test1.c a test7vc.c fatti
+
+
+TERMINALE GRANDE ALMENO 32 Y
+
+
+n. 465 processi
+/* Se noti che il nemico2 muore subito, forse nella pipe è rimasto ancora qualche oggetto missile
+

@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "scene.h": "c",
+        "header.h": "c",
+        "stdbool.h": "c",
+        "stdio.h": "c",
+        "sprites.h": "c",
+        "structs.h": "c",
+        "ncurses.h": "c",
+        "types.h": "c",
+        "pthread.h": "c",
+        "task.h": "c",
+        "time.h": "c"
+    }
+}

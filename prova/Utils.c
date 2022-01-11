@@ -4,7 +4,7 @@
 
 /* Da eliminare
 */
-bool HasEnemyCollided(object enemy, object* missiles, int missilesCount){
+bool HasEnemyCollided(Object enemy, Object* missiles, int missilesCount){
     int i;
     for(i = 0; i < missilesCount; i++){
         if( 
@@ -27,7 +27,7 @@ bool HasEnemyCollided(object enemy, object* missiles, int missilesCount){
     return false;    
 }
 
-int MissileCollided(object* enemy, object missiles, int enemiesCount){
+int MissileCollided(Object* enemy, Object missiles, int enemiesCount){
     int i;
     for(i = 0; i < enemiesCount; i++){
         if( range(enemy[i].x, enemy[i].x +3 , missiles.x) &&
@@ -40,7 +40,7 @@ int MissileCollided(object* enemy, object missiles, int enemiesCount){
 }
 
 
-int AstroCollided(object astroship, object dangerousObj){
+int AstroCollided(Object astroship, Object dangerousObj){
     int i = 1;
     if( dangerousObj.x - astroship.x == 5 &&  
             dangerousObj.y - astroship.y < 5 && 
