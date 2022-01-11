@@ -10,6 +10,9 @@
         "types.h": "c",
         "pthread.h": "c",
         "task.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "threadtasks.h": "c",
+        "processtasks.h": "c",
+        "signal.h": "c"
     }
 }

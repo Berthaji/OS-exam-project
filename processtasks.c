@@ -134,7 +134,7 @@ void pBomb(int pipeOut, Object o){
 
     while (loop){
         o.x--;                     /* sposto la bomba verso sinistra
-        /* o.y += o.dir ? -1 : 1; /* Per spostare la bomba in alto o in basso */
+        /* o.y += o.dir ? -1 : 1; Per spostare la bomba in alto o in basso */
         
         /**
          * se il missile è fuori dallo schermo dobbiamo terminare il processo
@@ -163,8 +163,8 @@ void pMissile(int pipeOut, Object o){
     bool loop = true;
     while (loop){
         o.x++;                     /* sposto il missile verso sinistra
-        /* o.y += 0; /* o.dir ? -1 : 1; /* sposto il missile in basso o in alto a seconda della sua direzione */
-        o.y += (o.dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;      /* $$diagonale vera
+        /* o.y += 0; o.dir ? -1 : 1; /* sposto il missile in basso o in alto a seconda della sua direzione */
+        o.y += (o.dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;      
 
         /**
          * se il missile è fuori dallo schermo dobbiamo terminare il processo

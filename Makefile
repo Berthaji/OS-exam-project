@@ -1,5 +1,9 @@
+default:
+	gcc main.c scene.c processtasks.c threadtasks.c -o spacedefender -lncurses -pthread
+
+clean:
+	rm /*.o
+	rm ./spacedefender
+
 run:
-	gcc main.c scene.c scene.h processtasks.c  processtasks.h threadtasks.c  threadtasks.h -o procc -lncurses -pthread
-	./procc
-
-
+	./spacedefender
