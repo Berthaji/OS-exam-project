@@ -113,3 +113,9 @@ void drawScene(
 
 
 void drawObject(Object entity);
+
+bool range(int min, int max, int value);
+
+int astroCollided(Object astroship, Object dangerousObj);
+
+int missileCollided(Object* enemy, Object missiles, int enemiesCount);

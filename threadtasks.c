@@ -168,8 +168,10 @@ int mains(){
         //Abilitazione condizioni di giocabilità (game Win o Game Over)
         pthread_mutex_lock(&tMutex); 
         *status = statusConditionsThread(*life, enemies1,*enemies1Count,enemies2, *enemies2Count);
+
         if(*status > 0)
             loops = false;
+            
         pthread_mutex_unlock(&tMutex);
 
 
@@ -527,6 +529,7 @@ void* tMissile(void* parameters){
                 //Collisione col nemico di secondo livello
                 int i;
                 for(i = 0; i < *enemies1Count; i++ ){
+
                     if( range(enemies2[i].x, enemies2[i].x , o->x) &&
                         range(enemies2[i].y, enemies2[i].y +3 , o->y)       //$$ 3 e 3 sono parametri della dimensione da dare con define
                         //&& o->state == INITIALIZED

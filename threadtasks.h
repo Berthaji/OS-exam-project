@@ -60,3 +60,8 @@ void checkCollision();
 int mains();
 
 
+int statusConditionsThread(bool life,
+    Object *enemies1, int enemies1Count,
+    Object *enemies2, int enemies2Count);
+
+
