@@ -28,9 +28,22 @@
 #define ASTRODIM        5           //Dimensioni (in entrambi gli assi) dello sprite astronave
 #define ENEMYDIM        3           //Dimensioni (in entrambi gli assi) dello sprite nemico (lv. 1 e lv. 2)
 
+#define ENEMYSLEEP1 100000
+#define ENEMYSLEEP2 100000
+#define BOMBSLEEP 80000
+#define MISSILESLEEP 5000
+#define SHOT_ANGLE_CORRECTION 0.05
+//0.625
+
+
+#define ENEMY_GENERATION_WIDTH 0.75     //Percentuala dal bordo di schermo a cui cominciare la generazione
+#define ENEMY_GENERATION_DISTANCE_COLUMN 5   //Distanza tra linee di nemici per colonna
+#define ENEMY_GENERATION_DISTANCE_LINES 7    //Distanza tra colonne di nemici generati
+#define ENEMY_GENERATION_LINES 4            //Numero di linee di nemici
+
 
 /* Define interne di supporto */
-#define DELAY_ARRSTART 80000
+#define DELAY_ARRSTART 1000000
 
 #define DIM_ARRSTART_Y 37
 #define DIM_ARRSTART_X 285
@@ -119,3 +132,10 @@ bool range(int min, int max, int value);
 int astroCollided(Object astroship, Object dangerousObj);
 
 int missileCollided(Object* enemy, Object missiles, int enemiesCount);
+
+void drawFinalScene(int status);
+
+void gameWin();
+
+void gameLose();
+

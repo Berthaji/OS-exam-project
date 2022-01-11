@@ -25,8 +25,7 @@ int main(){
             break;
 
         case 1: /* Media */
-             
-            mains();
+            tEngine(3,4,7);
             break;
 
         case 2: /* Difficile */
@@ -34,7 +33,7 @@ int main(){
             break;
 
         case 3: /* Molto casuale */
-            
+            exit(0);
             break;
         
         default:

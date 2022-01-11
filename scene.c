@@ -197,7 +197,7 @@ char win[13][103+1] = {
 {"                Complimenti!                                                                          "},
 {"                Ora che abbiamo spazio, posso sistemare la mia collezione di teschi alieni            "},
 {"                                                                                                      "},
-{"                Se vuoi rigiocare, premi la barra spaziatrice, altrimenti q per uscire                "},                                                                           
+{"                                                                                                      "},                                                                           
 {"                                                                                                      "}                                                                                                                    
 
 
@@ -215,11 +215,11 @@ char lose[14][121+1] = {
 {"oo     .d8P `88b    ooo  `88b    d88'  8       `888   888          888       888           888       .8'     `888.  .o. "},
 {"8""88888P'   `Y8bood8P'   `Y8bood8P'  o8o        `8  o888o        o888o     o888o         o888o     o88o     o8888o Y8P "},
 {"                                                                                                                        "},
-{"                         Peccato, sarà per un'altra volta                                                               "},
-{"                         Nel frattempo torna a consegnare pizze, va'                                                    "},
+{"                                        Peccato, sarà per un'altra volta                                                "},
+{"                                    Nel frattempo torna a consegnare pizze, va'                                         "},
 {"                                                                                                                        "},
 {"                                                                                                                        "},
-{"                         Se vuoi rigiocare, premi la barra spaziatrice, altrimenti q per uscire                         "},                                                                              
+{"                                                                                                                        "},                                                                              
 {"                                                                                                                        "}
 
 };
@@ -283,8 +283,9 @@ int kbhit(void){
  * 
  */
 void clearScreen(){
-    for (int y = 0; y < SCREEN_H; y++)
-        for (int x = 0; x < SCREEN_W; x++)
+    int y,x;
+    for (y = 0; y < SCREEN_H; y++)
+        for (x = 0; x < SCREEN_W; x++)
             mvaddch(y, x, ' ');
 }
 
@@ -310,13 +311,14 @@ void drawSplashScreen(){
         /* Prima parte della scritta - space defender */
         
         /* Effetto scattoso */
-        for (int y = 0; y < 40; y++)
-            for (int x = 0; x < DIM_ARRSTART_X_COLUMNS; x++)
+        int x,y;
+        for (y = 0; y < 40; y++)
+            for (x = 0; x < DIM_ARRSTART_X_COLUMNS; x++)
                 mvaddch(y, x, ' ');
             
 
-        for (int y = 0; y < DIM_ARRSTART_Y_FIRSTLINE; y++)
-            for (int x = 0; x < DIM_ARRSTART_X_COLUMNS; x++){
+        for (y = 0; y < DIM_ARRSTART_Y_FIRSTLINE; y++)
+            for (x = 0; x < DIM_ARRSTART_X_COLUMNS; x++){
                 if(arrStart[y][x] == '\\' && bo)
                     mvaddch(y, x, arrStart[y][x]);
                 if(arrStart[y][x] == '/' && !bo)
@@ -324,8 +326,8 @@ void drawSplashScreen(){
             }
 
         /*Seconda parte della scritta - the remastered version */
-        for (int y = DIM_ARRSTART_Y_FIRSTLINE; y < DIM_ARRSTART_Y_SECONDLINE; y++)
-            for (int x = 0; x < DIM_ARRSTART_X_COLUMNS; x++)
+        for (y = DIM_ARRSTART_Y_FIRSTLINE; y < DIM_ARRSTART_Y_SECONDLINE; y++)
+            for (x = 0; x < DIM_ARRSTART_X_COLUMNS; x++)
                     mvaddch(y, x, arrStart[y][x]);
             
 
@@ -341,7 +343,8 @@ int drawMenu(){
     int choice = 0;
     bool chosen = false;
 
-    for (int y = 0; y < DIM_ARRMENU_Y; y++)
+    int y;
+    for (y = 0; y < DIM_ARRMENU_Y; y++)
         mvprintw(y,0, arrMenu[0][y]);
 
     while(!chosen){
@@ -351,7 +354,7 @@ int drawMenu(){
             case KEY_UP & A_CHARTEXT:
                 if(!(choice == 0)){ /* Non siamo al bordo superiore */
                     choice--;
-                    for (int y = 0; y < DIM_ARRMENU_Y; y++)
+                    for (y = 0; y < DIM_ARRMENU_Y; y++)
                         mvprintw(y,0, arrMenu[choice][y]);
                 }
                 break;
@@ -359,7 +362,7 @@ int drawMenu(){
             case KEY_DOWN & A_CHARTEXT:
                 if(!(choice == 3)){ //Non siamo al bordo inferiore
                     choice++;
-                    for (int y = 0; y < DIM_ARRMENU_Y; y++)
+                    for (y = 0; y < DIM_ARRMENU_Y; y++)
                         mvprintw(y,0, arrMenu[choice][y]);
                 }
                 break;
@@ -369,7 +372,7 @@ int drawMenu(){
                 break;
         }
         clearScreen();
-        for (int y = 0; y < DIM_ARRMENU_Y; y++)
+        for (y = 0; y < DIM_ARRMENU_Y; y++)
             mvprintw(y,0, arrMenu[choice][y]);
         refresh();
     }
@@ -508,8 +511,40 @@ int astroCollided(Object astroship, Object dangerousObj){
     return -1;    
 }
 
+void drawFinalScene(int  status){
+    if(status == 1)
+        gameWin();
+    else
+        gameLose();
+    
+    //Status = -1 => si gioca ancora
+    //Status = 0 => 
+    //Status = 1 => si esce dal gioco come vincitori
+    //Status = 2 => si esce perdenti (navicelle a sx)
+    //Status = 3 => si esce perdenti (life == 0)
+}
 
 
+void gameWin(){
+    clearScreen();
+    int i;
+    for(i=0; i<13; i++)
+        mvprintw(i, 0, win[i]);
+    refresh();
+    
+    sleep(5);
+    clearScreen();
+}
 
+void gameLose(){   
+    clearScreen();
+    int i;
+    for(i=0; i<13; i++)
+        mvprintw(i, 0, lose[i]);
+    refresh();
+    
+    sleep(5);
+    clearScreen();
+}
 
 

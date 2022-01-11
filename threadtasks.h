@@ -11,17 +11,17 @@ Object * bombs;
 int *doubleMissile;      //Array per contenere il fatto che il nemico di secondo livello sia stato attaccato 2 volte
 
 int* missilesCount;      //Contatore numero di missili
+int* missile2Count;    
 int* enemies1Count;                                  
 int* enemies2Count;
 int* bombsCount;
-
-int* missile2Count;    //$$ da togliere?
 
 
 int* status;
 int* life;
 
 pthread_mutex_t tMutex; 
+
 
 
 
@@ -33,13 +33,7 @@ void* tMissile(void* parameters);
 
 void* tBombe2(void* parameters);
 
-void drawScenes(
-    // Object *astroship,
-    // Object *enemies, int enemiesCount,
-    // Object *enemies2, int enemies2Count,
-    // Object *missiles, int missilesCount,
-    // Object *bombs, int bombsCount
-    );
+void drawScenes();
 
 int statusConditionsThread(bool life,
     Object *enemies1, int enemies1Count,
@@ -47,21 +41,14 @@ int statusConditionsThread(bool life,
 
 void tEnd(int i);
 
-
-bool ttenemy(Object * o, bool bo);
-
-
 void myInitScreen();
+
 void clearScreens();
 
 void checkCollision();
 
+void tEngine(int lifes, int enemiesdim, int shotProb);
 
-int mains();
 
-
-int statusConditionsThread(bool life,
-    Object *enemies1, int enemies1Count,
-    Object *enemies2, int enemies2Count);
 
 
