@@ -1,7 +1,7 @@
 
-#include "scene.h"
+//#include "scene.h"
 #include "processtasks.h"
-#include "threadtasks.h"
+//#include "threadtasks.h"
 
 
 int main(){
@@ -25,18 +25,15 @@ int main(){
             break;
 
         case 1: /* Media */
-            tEngine(3,4,7);
+            //tEngine(3,4,7);
             break;
 
         case 2: /* Difficile */
-            
+            exit(0);
             break;
 
         case 3: /* Molto casuale */
             exit(0);
-            break;
-        
-        default:
             break;
     }
     

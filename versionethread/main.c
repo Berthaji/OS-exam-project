@@ -1,6 +1,6 @@
 
-#include "scene.h"
-#include "processtasks.h"
+//#include "scene.h"
+//#include "processtasks.h"
 #include "threadtasks.h"
 
 
@@ -21,7 +21,7 @@ int main(){
    
     switch (choice){
         case 0: /* Facile */
-            pEngine(3,4,7);
+            //pEngine(3,4,7);
             break;
 
         case 1: /* Media */
@@ -29,14 +29,11 @@ int main(){
             break;
 
         case 2: /* Difficile */
-            
+            exit(0);
             break;
 
         case 3: /* Molto casuale */
             exit(0);
-            break;
-        
-        default:
             break;
     }
     

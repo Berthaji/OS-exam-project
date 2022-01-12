@@ -26,3 +26,12 @@ TERMINALE GRANDE ALMENO 32 Y
 n. 465 processi
 /* Se noti che il nemico2 muore subito, forse nella pipe è rimasto ancora qualche oggetto missile
 
+
+
+processi
+    sconfitta OK
+    vittoria OK
+
+thread
+    sconfitta
+    vittoria
