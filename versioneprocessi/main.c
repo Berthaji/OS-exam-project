@@ -41,6 +41,7 @@ int main(){
     }
     
     attroff(COLOR_PAIR(color));
+    sleep(10);
     endwin();
     return 0;
 
