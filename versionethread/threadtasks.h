@@ -45,7 +45,7 @@ void clearScreens();
 
 void checkCollision();
 
-void tEngine(int lifes, int enemiesdim, int shotProb);
+void tEngine(int lifes, int enemiesdim, int shotProb, int color);
 
 
 

@@ -190,7 +190,7 @@ void pMissile(int pipeOut, Object o){
  * in essa vengono lette le informazioni prodotte dai processi,
  * gestita la logica di gioco e predisposto tutto per il disegno su schermo
  */
-void pEngine(int life, int enemiesdim, int shotProb){
+void pEngine(int life, int enemiesdim, int shotProb, int color){
 
     /* variabili di supporto */
     bool missilesShooted = false;
@@ -225,10 +225,6 @@ void pEngine(int life, int enemiesdim, int shotProb){
     pipeIn = fs[0];         /* pipeIn -> Lettura  */
     pipeOut = fs[1];        /* pipeOut -> Scrittura  */
 
-    
-    /* Inizializzare un colore per il gioco  */
-    int color = (rand()%(DIM_COLORS-1))+1;
-    attron(COLOR_PAIR(color));
 
     /* Inizializzazione della astronave   */
     astroship->x = 1;
@@ -524,13 +520,10 @@ void pEngine(int life, int enemiesdim, int shotProb){
         }
         
         /* Liberazione eventuali risorse */
-        pClean(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);
-        //refresh();
-    
+        pClean(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);    
     }
 
-    /* Usciti dal loop, abbiamo vinto o perso
-    /* funzione killa robe    */
+    /* funzione killa robe */
     pEnd(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount, fs);
     
 

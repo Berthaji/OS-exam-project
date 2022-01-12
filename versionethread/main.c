@@ -18,6 +18,10 @@ int main(){
     int choice = drawMenu();
     
     clearScreen();
+
+    /* Inizializzare un colore per il gioco  */
+    int color = (rand()%(DIM_COLORS-1))+1;
+    attron(COLOR_PAIR(color));
    
     switch (choice){
         case 0: /* Facile */
@@ -25,7 +29,7 @@ int main(){
             break;
 
         case 1: /* Media */
-            tEngine(3,4,7);
+            tEngine(3,4,7, color);
             break;
 
         case 2: /* Difficile */
@@ -37,7 +41,7 @@ int main(){
             break;
     }
     
-
+    attroff(COLOR_PAIR(color));
     endwin();
     return 0;
 

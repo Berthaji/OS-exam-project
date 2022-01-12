@@ -7,7 +7,7 @@ void pEnemy1(int pipeOut, Object o);
 void pEnemy2(int pipeOut, Object o);
 void pBomb(int pipeOut, Object o);
 void pMissile(int pipeOut, Object o);
-void pEngine(int life, int enemiesdim, int shotProb);
+void pEngine(int life, int enemiesdim, int shotProb, int color);
 
 void pEnd( 
     Object *astroship,

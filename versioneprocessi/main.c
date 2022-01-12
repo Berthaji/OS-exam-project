@@ -12,16 +12,19 @@ int main(){
     /* Visualizzazione della splash screen */       
     drawSplashScreen();
     
-    
     /* Visualizzazione del menu e presa della scelta*/
     clearScreen();
     int choice = drawMenu();
     
     clearScreen();
+
+    /* Inizializzare un colore per il gioco  */
+    int color = (rand()%(DIM_COLORS-1))+1;
+    attron(COLOR_PAIR(color));
    
     switch (choice){
         case 0: /* Facile */
-            pEngine(3,4,7);
+            pEngine(3,4,7, color);
             break;
 
         case 1: /* Media */
@@ -37,7 +40,7 @@ int main(){
             break;
     }
     
-
+    attroff(COLOR_PAIR(color));
     endwin();
     return 0;
 

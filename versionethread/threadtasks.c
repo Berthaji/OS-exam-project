@@ -1,12 +1,8 @@
 #include "threadtasks.h"
 
-void tEngine(int lifes, int enemiesdim, int shotProb){
+void tEngine(int lifes, int enemiesdim, int shotProb, int color){
 
     clearScreens();
-
-    /* Inizializzare un colore per il gioco  */
-    int color = (rand()%(DIM_COLORS-1))+1;
-    attron(COLOR_PAIR(color));
     
     missilesCount =  (int*) malloc (sizeof(int)); // * 1 è ridondante
     *missilesCount = 0;         //nb _,0; __,1
