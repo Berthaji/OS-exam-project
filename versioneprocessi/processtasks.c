@@ -545,25 +545,34 @@ void pClean(
     int i;
     for (i = 0; i < missilesCount; i++)
         if(missiles[i].state == KILLED)
-            if(!kill(missiles[i].pid,SIGKILL))
+            if(!kill(missiles[i].pid,SIGKILL)){
+                waitpid(-1, NULL, WNOHANG);
                 wait(NULL);
+            }
+
     /* Bombe        */
     for (i = 0; i < bombsCount; i++)
         if(bombs[i].state == KILLED)
-            if(!kill(bombs[i].pid,SIGKILL))
+            if(!kill(bombs[i].pid,SIGKILL)){
+                waitpid(-1, NULL, WNOHANG);
                 wait(NULL);
+            }
 
     /* Nemici lv.1*/
     for (i = 0; i < enemies1Count; i++)
         if(enemies1[i].state == KILLED)
-            if(!kill(enemies1[i].pid,SIGKILL))
+            if(!kill(enemies1[i].pid,SIGKILL)){
+                waitpid(-1, NULL, WNOHANG);
                 wait(NULL);
+            }
 
     /* Nemici lv.2*/
     for (i = 0; i < enemies2Count; i++)
         if(enemies2[i].state == KILLED)
-            if(!kill(enemies2[i].pid,SIGKILL))
+            if(!kill(enemies2[i].pid,SIGKILL)){
+                waitpid(-1, NULL, WNOHANG);
                 wait(NULL);
+            }
   
 }
 
@@ -591,15 +600,19 @@ void pEnd(
 {
     
     clearScreen();
-
     close(fs[0]);
     close(fs[1]);
 
+    if(!kill(astroship->pid,SIGKILL)){
+        waitpid(-1, NULL, WNOHANG);
+        wait(NULL);
+    }
+    refresh();
 
     int i;   
     for (i = 0; i < missilesCount; i++){
         if(!kill(missiles[i].pid,SIGKILL)){
-            waitpid(-1, NULL, WNOHANG); //$$ da testare
+            waitpid(-1, NULL, WNOHANG);
             wait(NULL);
         }
         refresh();
