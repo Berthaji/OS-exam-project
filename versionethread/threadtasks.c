@@ -216,22 +216,17 @@ void* tastroship (void* parameters){
     Object* obj;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
     obj = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!
     int c;
-    //astroship->pid = parameters;
 
-    //Magari prima di metterci dati da rispedire, faccio un Mutex!
     //Bloccaggio di un mutex
     pthread_mutex_lock(&tMutex);
     obj->type = ASTROSHIP;
     obj->appearance = 2;
     obj->hasShot = false;
-
-    obj->pid = getpid();
-
-    obj->x = 6;
-    obj->y = 1;
+    obj->state = INITIALIZED;
+    obj->x = 1;
+    obj->y = (SCREEN_H - 3) / 2;
     //Mettere gli altri parametri $$
     pthread_mutex_unlock(&tMutex);
-
 
 
     while (true){

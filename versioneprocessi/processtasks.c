@@ -226,6 +226,7 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
     pipeOut = fs[1];        /* pipeOut -> Scrittura  */
 
 
+
     /* Inizializzazione della astronave   */
     astroship->x = 1;
     astroship->y = (SCREEN_H - 3) / 2;
