@@ -26,7 +26,7 @@
 #define ENEMYDIM        3           //Dimensioni (in entrambi gli assi) dello sprite nemico (lv. 1 e lv. 2)
 
 #define ENEMYSLEEP1 100000
-#define ENEMYSLEEP2 100000
+#define ENEMYSLEEP2 300000
 #define BOMBSLEEP 80000
 #define MISSILESLEEP 5000
 #define SHOT_ANGLE_CORRECTION 0.05

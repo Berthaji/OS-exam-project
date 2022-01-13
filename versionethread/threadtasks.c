@@ -229,7 +229,7 @@ void* tastroship (void* parameters){
     pthread_mutex_unlock(&tMutex);
 
 
-    while (true){
+    while (*status < 0){    //Se si chiude il resto del gioco, ha senso che anche il thread astronave si chiuda 
         c = getch();
         //mvprintw(6,6,"okchar"); //si ferma qui -> da risolvere
         //$$ da rivedere la posizione del mutex, magari prima degli if
@@ -285,7 +285,7 @@ void* tMissile(void* parameters){
     o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
 
 
-    while(o->state != KILLED){
+    while(o->state != KILLED && *status < 0){
     
         while(o->state == INITIALIZED){
                 pthread_mutex_lock(&tMutex);
@@ -317,6 +317,7 @@ void* tMissile(void* parameters){
                 }
 
                 o->x++;
+
                 o->y += (o->dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;  
 
                 //Bordo schermo
@@ -352,11 +353,16 @@ void* tEnemy1 (void* parameters){
     o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
 
     int loop=true;
-    while (loop){
+    while (loop  && *status < 0){
         pthread_mutex_lock(&tMutex);
 
         o->x--;                   //sposto il nemico verso destra
         //o->y += 0;               //Si spostano nello stesso modo
+        if(o->dir)
+            o->dir = 0;
+        else
+            o->dir = 1;
+
         o->y += o->dir ? -1 : 1; //sposto il nemico in basso o in alto a seconda della sua direzione
         //pthread_mutex_unlock(&tMutex);
 
@@ -415,7 +421,7 @@ void* tBombe(void* parameters){
     o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
 
     bool loop = true;
-    while (loop){
+    while (loop  && *status < 0){
         pthread_mutex_lock(&tMutex);
         
         while(o->state != KILLED){
@@ -448,7 +454,7 @@ void* tBombe2(void* parameters){
     Object* o;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
     o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
 
-   while(o->state != KILLED){
+   while(o->state != KILLED  && *status < 0){
         while(o->state == INITIALIZED){
             o->x--;
             if(o->x < 0){
@@ -471,9 +477,16 @@ void* tEnemy2(void* parameters){
 
     //Impostiamo ogni parametro del nemico, ma in realtà dovrei usare il mutex perchè o è comunque un riferimento 
     // pthread_mutex_lock(&tMutex);
-    while(o->state != KILLED){
+    while(o->state != KILLED  && *status < 0){
         while(o->state == INITIALIZED){
             o->x--;
+            
+            if(o->dir)
+                o->dir = 0;
+            else
+                o->dir = 1;
+            o->y += o->dir ? -1 : 1; //sposto il nemico in basso o in alto a seconda della sua direzione
+            
             if(o->x < 0){
                 o->x = -1;
                 o->x = -1;
@@ -491,7 +504,7 @@ void tEnd(){
     refresh();
     // pthread_cancel(astroship->tid);
     // pthread_join(astroship->tid, NULL);
-
+    sleep(2);   //Delay per permettere agli altri thread di chiudersi correttamente
     //free
     free(astroship);
     free(enemies1);

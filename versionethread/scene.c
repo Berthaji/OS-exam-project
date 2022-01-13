@@ -197,7 +197,7 @@ char win[13][103+1] = {
 {"                Complimenti!                                                                          "},
 {"                Ora che abbiamo spazio, posso sistemare la mia collezione di teschi alieni            "},
 {"                                                                                                      "},
-{"                                                                                                      "},                                                                           
+{"                                      (Premi un tasto per uscire)                                     "},                                                                          
 {"                                                                                                      "}                                                                                                                    
 
 
@@ -215,11 +215,11 @@ char lose[14][121+1] = {
 {"oo     .d8P `88b    ooo  `88b    d88'  8       `888   888          888       888           888       .8'     `888.  .o. "},
 {"8""88888P'   `Y8bood8P'   `Y8bood8P'  o8o        `8  o888o        o888o     o888o         o888o     o88o     o8888o Y8P "},
 {"                                                                                                                        "},
-{"                                        Peccato, sarà per un'altra volta                                                "},
-{"                                    Nel frattempo torna a consegnare pizze, va'                                         "},
+{"                                             Peccato, sarà per un'altra volta                                           "},
+{"                                         Nel frattempo torna a consegnare pizze, va'                                    "},
 {"                                                                                                                        "},
 {"                                                                                                                        "},
-{"                                                                                                                        "},                                                                              
+{"                                                (Premi un tasto per uscire)                                             "},                                                                               
 {"                                                                                                                        "}
 
 };
@@ -528,22 +528,23 @@ void drawFinalScene(int  status){
 void gameWin(){
     clearScreen();
     int i;
-    for(i=0; i<13; i++)
+    for(i=0; i<DIM_ARRMENU_; i++)
         mvprintw(i, 0, win[i]);
     refresh();
     
-    sleep(1);
+    //timeout(100);
+    getch();
     clearScreen();
 }
 
 void gameLose(){   
     clearScreen();
     int i;
-    for(i=0; i<13; i++)
+    for(i=0; i<DIM_ARRMENU_; i++)
         mvprintw(i, 0, lose[i]);
     refresh();
-    
-    sleep(1);
+    //timeout(100);
+    getch();
     clearScreen();
 }
 

@@ -51,6 +51,13 @@ void pEnemy1(int pipeOut, Object o){
 
     while (loop){
         o.x--;                   /* sposto il nemico verso destra */
+
+        if(o.dir)
+            o.dir = 0;
+        else
+            o.dir = 1;
+        
+        
         o.y += o.dir ? -1 : 1; /* sposto il nemico in basso o in alto a seconda della sua direzione (i nemici vanno su e giu) */
 
         /**
@@ -93,7 +100,11 @@ void pEnemy2(int pipeOut, Object o){
     o.pid = getpid();
     while (loop){
         o.x--;                   /* sposto il nemico verso destra*/
-        o.y += 0;               /* Si spostano nello stesso modo*/
+        
+        if(o.dir)
+            o.dir = 0;
+        else
+            o.dir = 1;
         
         /**
          * se il nemico è fuori dallo schermo dobbiamo terminare il processo
@@ -164,6 +175,8 @@ void pMissile(int pipeOut, Object o){
     while (loop){
         o.x++;                     /* sposto il missile verso sinistra
         /* o.y += 0; o.dir ? -1 : 1; /* sposto il missile in basso o in alto a seconda della sua direzione */
+        
+
         o.y += (o.dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;      
 
         /**
@@ -196,7 +209,7 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
     bool missilesShooted = false;
     int enemies1Count = enemiesdim;
     int enemies2Count = 0;
-    int missile2Count = 0;
+    int missile2Count = 1;      //Controllo secondo sparo missile per nemico lv.2
     int bombsCount = 0;
     int missilesCount = 0;
 
@@ -208,7 +221,9 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
     Object *enemies2 = (Object *)malloc(sizeof(Object) * 1);
     Object *bombs    = (Object *)malloc(sizeof(Object) * 1);
     Object *missiles = (Object *)malloc(sizeof(Object) * missilesCount);
-    bool *doubleMissile = (bool *) malloc(sizeof(bool)*1);      /* Array per contenere il fatto che il nemico di secondo livello sia stato attaccato 2 volte */
+
+    bool *doubleMissile = (bool *) malloc(sizeof(bool)* missile2Count);      /* Array per contenere il fatto che il nemico di secondo livello sia stato attaccato 2 volte */
+    doubleMissile[0] = false;   //Prima inizializzazione
 
     Object message; /* qui viene salvato il messaggio letto dalla pipe dei processi */
    
@@ -233,6 +248,7 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
     astroship->type = ASTROSHIP;
     astroship->hasShot = false;
     astroship->color = color;
+    astroship->state = INITIALIZED;
     astroship->appearance = rand() % ASTRODCHOICE;
     
     astroship->pid = fork();
@@ -269,6 +285,7 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
         }
     }
     
+    sleep(1);
     while (loop){
         read(pipeIn, &message, sizeof(Object));
         /* in questo switch va gestita la logica del gioco */
@@ -381,70 +398,101 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                 int id = message.id;
                 missiles[id].x = message.x;
                 missiles[id].y = message.y;
-                missiles[id].state = message.state;
 
-                /* Controllo delle collisioni coi nemici di primo livello */
-                int enemyid = missileCollided(enemies1,missiles[id],enemies1Count); 
-                if(enemyid > -1){  /* Match nemico missile*/
-                    if(enemies1[enemyid].state != DEAD){  
-                        /* Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile)*/
-                        
-                        /* Ammazzo il missile stesso*/
+                
+                bool isMissileAlive = false;
+                if(missiles[id].state > ALIVE && message.state < ALIVE){
+                    //abbiamo in entrata un missile inizializzato
+                    //me ne abbiamo salvato uno morto
+                    //Quindi lo ignoriamo
+                    isMissileAlive = false;
+                }
+                else{
+                    isMissileAlive = true;
+                    missiles[id].state = message.state;
+                }
+
+                if(isMissileAlive){
+                    /* Controllo delle collisioni coi nemici di primo livello */
+                    int enemyid = missileCollided(enemies1,missiles[id],enemies1Count); 
+                    if(enemyid > -1 ){  /* Match nemico missile*/
+                        if(enemies1[enemyid].state != DEAD){  
+                            /* Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile)*/
+                            
+                            /* Ammazzo il missile stesso*/
+                            missiles[id].y = -1;
+                            missiles[id].x = -1;
+                            missiles[id].state = DEAD;
+
+                            /* Gwnerazione nemico lv 2 */
+                            enemies2Count++;
+                            enemies2 = (Object *)realloc(enemies2, sizeof(Object) * enemies2Count);
+
+                            missile2Count++;
+                            doubleMissile = (bool *)realloc(doubleMissile, sizeof(bool) * missile2Count);
+                            doubleMissile[missile2Count-1] = false;
+
+                            int i;
+                            for (i = enemies2Count - 1; i < enemies2Count; i++){
+                                enemies2[i].x = enemies1[enemyid].x-1;
+                                enemies2[i].y = enemies1[enemyid].y; 
+                                enemies2[i].type = ENEMY2;
+                                enemies2[i].state = INITIALIZED;
+                                enemies2[i].appearance = 3;
+                                enemies2[i].id = i;
+                                enemies2[i].pid = fork();       
+                                if (enemies2[i].pid == 0){
+                                    enemies2[i].dir = 0;
+                                    pEnemy2(pipeOut, enemies2[i]);
+                                }
+                            }
+                                                    
+                            /* Ammazzo il nemico colpito */
+                            enemies1[enemyid].y = 0;
+                            enemies1[enemyid].x = 0;
+                            enemies1[enemyid].state = DEAD;
+                        }
+                    }
+
+                    /* Controllo delle collisioni coi nemici di secondo livello
+                    /* Controlliamo se è stato colpito 2 volte */
+                    int enemy2id = missileCollided(enemies2,missiles[id],enemies2Count);
+
+                    if(doubleMissile[enemy2id] == true 
+                    && enemy2id > -1 
+                    ){  /* Match nemico2 missile (colpito almeno 2 volte) */
+                        //clearScreen();
+                        // mvprintw(1,0, "COLLISIONE 2 - EN2ID: %d    ", enemy2id);
+                        // sleep(1);
+                        // refresh();
+                        //sleep(3);
+                        //if(enemies2[enemy2id].state != DEAD){  
+                            /* Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile) */
+                            enemies2[enemy2id].y = 0;
+                            enemies2[enemy2id].x = 0;
+                            enemies2[enemy2id].state = DEAD;
+                        //}
+
+                        /* Ammazzo il missile stesso */
                         missiles[id].y = -1;
                         missiles[id].x = -1;
                         missiles[id].state = DEAD;
-
-                        /* Gwnerazione nemico lv 2 */
-                        enemies2Count++;
-                        enemies2 = (Object *)realloc(enemies2, sizeof(Object) * enemies2Count);
-
-                        missile2Count++;
-                        doubleMissile = (bool *)realloc(doubleMissile, sizeof(bool) * missile2Count);
-                        doubleMissile[missile2Count] = false;
-
-                        int i;
-                        for (i = enemies2Count - 1; i < enemies2Count; i++){
-                            enemies2[i].x = enemies1[enemyid].x-1;
-                            enemies2[i].y = enemies1[enemyid].y; 
-                            enemies2[i].type = ENEMY2;
-                            enemies2[i].state = INITIALIZED;
-                            enemies2[i].appearance = 3;
-                            enemies2[i].id = i;
-                            enemies2[i].pid = fork();       
-                            if (enemies2[i].pid == 0){
-                                enemies2[i].dir = 0;
-                                pEnemy2(pipeOut, enemies2[i]);
-                            }
-                        }
-                                                 
-                        /* Ammazzo il nemico colpito */
-                        enemies1[enemyid].y = 0;
-                        enemies1[enemyid].x = 0;
-                        enemies1[enemyid].state = DEAD;
+                        //usleep(500000);
                     }
-                }
 
-                /* Controllo delle collisioni coi nemici di secondo livello
-                /* Controlliamo se è stato colpito 2 volte */
-                int enemy2id = missileCollided(enemies2,missiles[id],enemies2Count);
+                    if(doubleMissile[enemy2id] == false && enemy2id > -1 && enemies2[enemy2id].state == INITIALIZED){         
+                        /*  Un nemico lv. 2 Non è mai stato colpito prima, impostiamo su true */
+                        doubleMissile[enemy2id] = true;
+                        // clearScreen();
+                        // mvprintw(1,0, "COLLISIONE 1 - EN2ID: %d     ", enemy2id);
+                        // refresh();
+                        //sleep(1);
 
-                if(doubleMissile[enemy2id] == true && enemy2id > -1){  /* Match nemico2 missile (colpito almeno 2 volte) */
-                    if(enemies2[enemy2id].state != DEAD){  
-                        /* Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile) */
-                        enemies2[enemy2id].y = 0;
-                        enemies2[enemy2id].x = 0;
-                        enemies2[enemy2id].state = DEAD;
+                        /* Ammazzo il missile stesso */
+                        missiles[id].y = -1;
+                        missiles[id].x = -1;
+                        missiles[id].state = DEAD;
                     }
-                }
-
-                if(doubleMissile[enemy2id] == false && enemy2id > -1){         
-                    /*  Un nemico lv. 2 Non è mai stato colpito prima, impostiamo su true */
-                    doubleMissile[enemy2id] = true;
-
-                    /* Ammazzo il missile stesso */
-                    missiles[id].y = -1;
-                    missiles[id].x = -1;
-                    missiles[id].state = DEAD;
                 }
                 break;
             }
@@ -517,6 +565,7 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
         status = statusConditions(life, enemies1, enemies1Count, enemies2, enemies2Count);
         if(status > 0){
             loop = false;
+            sleep(5);
             drawFinalScene(status);
         }
         
