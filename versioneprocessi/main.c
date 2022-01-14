@@ -1,8 +1,9 @@
+/**
+ * @file main.c
+ * @brief File principale da cui far eseguire il gioco
+ */
 
-//#include "scene.h"
 #include "processtasks.h"
-//#include "threadtasks.h"
-
 
 int main(){
     srand(time(NULL));
@@ -41,10 +42,7 @@ int main(){
             break;
     }
     
-    attroff(COLOR_PAIR(color));
-    sleep(2);
+    attroff(COLOR_PAIR(color)); /* Disabilitazione colori del gioco */
     endwin();
     return 0;
-
-    
 }

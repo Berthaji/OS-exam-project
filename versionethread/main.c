@@ -1,6 +1,9 @@
 
-//#include "scene.h"
-//#include "processtasks.h"
+/**
+ * @file main.c
+ * @brief File principale da cui far eseguire il gioco
+ */
+
 #include "threadtasks.h"
 
 
@@ -33,7 +36,7 @@ int main(){
             break;
 
         case 2: /* Difficile */
-            tEngine(3,8,10, color);
+            tEngine(3,8,1000, color);
             break;
 
         case 3: /* Molto casuale */
@@ -41,8 +44,7 @@ int main(){
             break;
     }
     
-    attroff(COLOR_PAIR(color));
-    sleep(2);
+    attroff(COLOR_PAIR(color)); /* Disabilitazione colori del gioco */
     endwin();
     return 0;
 

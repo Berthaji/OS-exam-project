@@ -1,10 +1,26 @@
+/**
+ * @file threadtasks.c
+ * @brief ibreria del motore grafico del gioco in versione thread/mutex
+ */
+
+
 #include "threadtasks.h"
 
+/**
+ * @brief uesta funzione è il cuore del gioco nella versione thread, 
+ * in essa vengono lette le informazioni prodotte dai thread,
+ * gestita la logica di gioco e predisposto tutto per il disegno su schermo
+ * 
+ * @param life Contatore numero di vite
+ * @param enemiesdim Numero di nemici da mostrare
+ * @param shotProb Probabilità di lancio di una bomba da parte di un qualunque nemico
+ * @param color Colore usato nel gioco
+ */
 void tEngine(int lifes, int enemiesdim, int shotProb, int color){
 
     attron(COLOR_PAIR(color));
 
-    clearScreens();
+    clearScreen();
     
     missilesCount =  (int*) malloc (sizeof(int)); // * 1 è ridondante
     *missilesCount = 0;         //nb _,0; __,1
@@ -119,7 +135,6 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         
 
         pthread_create(&(missiles[i].tid), NULL, tMissile, (void*)(&missiles[i]));
-            
         pthread_mutex_unlock(&tMutex);   
     }
 
@@ -128,7 +143,7 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
     while(loops){
         usleep(1000);       //Sleep per dare un effetto di scattosità al gioco
 
-        clearScreens();
+        clearScreen();
 
         //Collisioni tra oggetti
         pthread_mutex_lock(&tMutex);
@@ -140,25 +155,14 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         drawScenes();
         pthread_mutex_unlock(&tMutex);
 
-        
-
-
         pthread_mutex_lock(&tMutex); 
         //GENERAZIONE BOMBE
-        //int shot = 0;
-        if(rand()%100000 < shotProb){ //$$ oltre 30 da problemi di oggetti non cancellati
-        //if(difference - msec >= 2){
-            //difference = 0;
-            //pthread_mutex_lock(&tMutex); 
-
+        if(rand()%100000 < shotProb){ 
             if(bombs[*bombsCount].state != INITIALIZED){
-                //La bomba non sta "camminando": puoi agire
-
-                //Prepariamo la bomba per essere sparata
-
-                /*Scegliamo il nemico da cui partire*/
-                /*
-                    Prtiamo da quello di primo livello, se morto quello di secondo
+                /* La bomba non sta "camminando": puoi agire
+                 Prepariamo la bomba per essere sparata
+                 Scegliamo il nemico da cui partire
+                Partiamo da quello di primo livello, se morto quello di secondo
                     se entrambi morti allora non stampare
                 */
 
@@ -180,7 +184,6 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
                     bombs[*bombsCount].state = INITIALIZED;
                 }
                 else{       //Entrambi morti aa quell'indice -> Nulla da fare in particolare
-
                 }
 
                 
@@ -195,25 +198,31 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         }
         pthread_mutex_unlock(&tMutex);
 
-
         //Abilitazione condizioni di giocabilità (game Win o Game Over)
         pthread_mutex_lock(&tMutex); 
         *status = statusConditionsThread(*life, enemies1,*enemies1Count,enemies2);
         //pthread_mutex_unlock(&tMutex);
         if(*status > 0){
             loops = false;
+            clearScreen();
+            refresh();
+            sleep(1);
             drawFinalScene(*status);
         }
         pthread_mutex_unlock(&tMutex);
 
-
     }
-
-    // //Abbozzo di tEnd
+    /* Terminazione delle risorse */
     tEnd();
     
 }
 
+/**
+ * @brief Funzione per la gestione della astronave
+ * 
+ * @param parameters Oggetto astronave su cui lavorare
+ * @return void* 
+ */
 void* tastroship (void* parameters){
     Object* obj;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
     obj = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!
@@ -227,9 +236,8 @@ void* tastroship (void* parameters){
     obj->state = INITIALIZED;
     obj->x = 1;
     obj->y = (SCREEN_H - 3) / 2;
-    //Mettere gli altri parametri $$
-    pthread_mutex_unlock(&tMutex);
 
+    pthread_mutex_unlock(&tMutex);
 
     while (*status < 0){    //Se si chiude il resto del gioco, ha senso che anche il thread astronave si chiuda 
         c = getch();
@@ -251,7 +259,6 @@ void* tastroship (void* parameters){
                     obj->y++;
                 }
                 pthread_mutex_unlock(&tMutex);
-                //obj->y--;
                 break;
 
             case ' ': //Barra spaziatrice
@@ -274,24 +281,24 @@ void* tastroship (void* parameters){
                 pthread_mutex_unlock(&tMutex);
                 break;
         }//Fine switch
-
-  
     }
     return NULL;
-    //exit(0);
 }
 
 //Missile
+/**
+ * @brief Funzione per la gestione dei missili
+ * 
+ * @param parameters Oggetto missile su cui lavorare
+ * @return void* 
+ */
 void* tMissile(void* parameters){
     Object* o;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
     o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
 
-
     while(o->state != KILLED && *status < 0){
-    
         while(o->state == INITIALIZED){
             pthread_mutex_lock(&tMutex);
-
             //Collisione col nemico di secondo livello
             int i;
             for(i = 0; i < *enemies1Count; i++ ){
@@ -305,21 +312,19 @@ void* tMissile(void* parameters){
                         //Incremento opportuno
                         if(doubleMissile[i] == 1){
                             doubleMissile[i] = 2;
-                        
                         }
                         else if(doubleMissile[i] == 0){
                             doubleMissile[i] = 1;
                         }   
 
                         //condizione ulteriore di uscita dal ciclo
-                        o->state = DEAD;   //altrimenti o->x = -3; 
+                        o->state = DEAD;
                         o->x = -1;
                         o->y = -1;
                 }
             }
 
             o->x++;
-
             o->y += (o->dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;  
 
             //Bordo schermo
@@ -328,7 +333,6 @@ void* tMissile(void* parameters){
                 o->x = -1;
                 o->state = DEAD;
             }
-
             if(o->x > SCREEN_W){
                 o->x = -1;
                 o->x = -1;
@@ -336,7 +340,6 @@ void* tMissile(void* parameters){
             }
 
             pthread_mutex_unlock(&tMutex);
-
             usleep(MISSILESLEEP);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
         }
     }
@@ -348,7 +351,12 @@ void* tMissile(void* parameters){
     return NULL;
 }
 
-
+/**
+ * @brief Funzione per la gestione del nemico di livello 1
+ * 
+ * @param parameters Oggetto nemico su cui lavorare
+ * @return void* 
+ */
 void* tEnemy1 (void* parameters){
     Object* o;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
     o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
@@ -358,18 +366,13 @@ void* tEnemy1 (void* parameters){
         pthread_mutex_lock(&tMutex);
 
         o->x--;                   //sposto il nemico verso destra
-        //o->y += 0;               //Si spostano nello stesso modo
         if(o->dir)
             o->dir = 0;
         else
             o->dir = 1;
 
-        o->y += o->dir ? -1 : 1; //sposto il nemico in basso o in alto a seconda della sua direzione
-        //pthread_mutex_unlock(&tMutex);
-
-        //o.dir == 0 --> 1
-        //o.dir == 1 --> -1
-
+        o->y += o->dir ? -1 : 1;  /* sposto il nemico in basso o in alto di continuo per dare più movimento*/
+       
         /**
          * se il nemico è fuori dallo schermo dobbiamo terminare il processo
          * perciò terminiamo il loop, comunichiamo al processo principale che il nemico 
@@ -378,23 +381,17 @@ void* tEnemy1 (void* parameters){
 
         //se il nemico non è ai bordi si può muovere tranquillamente, altrimenti lo spostiamo più dentro
         if (o->y >= SCREEN_H -2){    //Bordo inferiore superato
-            //pthread_mutex_lock(&tMutex);
             o->y--;
             o->dir = 1;
-            //pthread_mutex_unlock(&tMutex);
         }
 
         if (o->y <= 0 ){    //Bordo superiore superato
-            //pthread_mutex_lock(&tMutex);
             o->y++;
             o->dir = 0;
-            //pthread_mutex_unlock(&tMutex);
         }
 
         if (o->x < 0){
             loop = false;
-        
-            //pthread_mutex_lock(&tMutex);
             o->state = DEAD;
         }
 
@@ -412,43 +409,6 @@ void* tEnemy1 (void* parameters){
 
     return NULL;
 }
-
-
-
-
-//Bombe//
-void* tBombe(void* parameters){
-    Object* o;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
-    o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
-
-    bool loop = true;
-    while (loop  && *status < 0){
-        pthread_mutex_lock(&tMutex);
-        
-        while(o->state != KILLED){
-            while(o->state == INITIALIZED){
-                o->x--;
-                if(o->x < 0){
-                    o->x = -1;
-                    o->x = -1;
-                    o->state = DEAD;
-                }
-                usleep(80000);   
-            }
-        }
-        pthread_mutex_unlock(&tMutex); //Sblocchiamo il risultato della elaborazione
-        usleep(BOMBSLEEP);
-    }
-
-    o->x = -1;
-    o->y = -1;
-
-   
-
-
-    return NULL;
-}
-
 
 //Bombe//
 void* tBombe2(void* parameters){
@@ -472,16 +432,20 @@ void* tBombe2(void* parameters){
 }
 
 //Enemies 2 //
+/**
+ * @brief Funzione per la gestione del nemico di livello 2
+ * 
+ * @param parameters Oggetto nemico su cui lavorare
+ * @return void* 
+ */
 void* tEnemy2(void* parameters){
     Object* o;                                    //Noi non possiamo usare direttamente parameters perchè di tipo void*
     o = (Object*) parameters;                     //Ricorda che il cast è obbligatorio!  
 
     //Impostiamo ogni parametro del nemico, ma in realtà dovrei usare il mutex perchè o è comunque un riferimento 
-    // pthread_mutex_lock(&tMutex);
     while(o->state != KILLED  && *status < 0){
         while(o->state == INITIALIZED){
             o->x--;
-            
             if(o->dir)
                 o->dir = 0;
             else
@@ -500,7 +464,10 @@ void* tEnemy2(void* parameters){
 }
 
 
-
+/**
+ * @brief Funzione per la corrwtta terminazione delle risorse
+ * 
+ */
 void tEnd(){
     refresh();
     pthread_cancel(astroship->tid);
@@ -509,7 +476,7 @@ void tEnd(){
     sleep(2);   //Delay per permettere agli altri thread di chiudersi correttamente
     free(astroship);
     
-    //free
+    //free 
     free(enemies1);
     free(missiles);
     free(bombs);
@@ -526,35 +493,13 @@ void tEnd(){
 }
 
 
-
-void myInitScreen(){
-    initscr();
-    noecho();
-    keypad(stdscr, 1);
-    curs_set(0);
-    start_color();
-
-    init_pair(1, COLOR_RED, COLOR_BLACK);     /* Colore oggetto */
-    init_pair(2, COLOR_WHITE, COLOR_BLACK);   /* Colore per cancellare */
-    init_pair(3, COLOR_GREEN, COLOR_BLACK);   /* Colore per cancellare */
-    init_pair(4, COLOR_BLUE, COLOR_BLACK);    /* Colore per cancellare */
-    init_pair(5, COLOR_CYAN, COLOR_BLACK);    /* Colore per cancellare */
-    init_pair(6, COLOR_MAGENTA, COLOR_BLACK); /* Colore per cancellare */
-    init_pair(7, COLOR_RED, COLOR_BLACK);     /* Colore per cancellare */
-    init_pair(8, COLOR_YELLOW, COLOR_BLACK);  /* Colore per cancellare */
-}
-
-void clearScreens(){
-    int y,x;
-    for (y = 0; y < SCREEN_H; y++)
-        for (x = 0; x < SCREEN_W; x++)
-            mvaddch(y, x, ' ');
-}
-
-
+/**
+ * @brief Funzione per il disegno degli oggetti
+ * 
+ */
 void drawScenes(){
 
-    clearScreens();
+    clearScreen();
     drawObject(*astroship);
 
     int i;
@@ -583,13 +528,15 @@ void drawScenes(){
 }
 
 
-//Check delle collisioni
 
+/**
+ * @brief Funzione per il controllo delle collisioni
+ * 
+ */
 void checkCollision(){
     //Collisioni da controllare:
     //1. Missili-Nemici -> Nemici lv.2 OK
     //2. Missili-Nemici lv.2 -> Muore Nemico
-
     //3. Bombe-Astronave -> Vite--
     //4. Nemico-Astronave -> Muore Astronave
     //5. Astronave - Nemici lv. 2 -> Vite --
@@ -662,6 +609,15 @@ void checkCollision(){
 
 
 
+/**
+ * @brief Funzioni per il controllo delle condizioni di uscita o continuo del gioco
+ * 
+ * @param life Contatore vire
+ * @param enemies1 Nemici di primo livello
+ * @param enemies1Count Contatore nemici
+ * @param enemies2 Nemici di secondo livello
+ * @return int Indice di ritorno della codnzioni di gioco
+ */
 int statusConditionsThread(bool life,
     Object *enemies1, int enemies1Count,
     Object *enemies2){

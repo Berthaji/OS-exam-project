@@ -50,14 +50,12 @@ void pEnemy1(int pipeOut, Object o){
 
     while (loop){
         o.x--;                   /* sposto il nemico verso destra */
-
         if(o.dir)
             o.dir = 0;
         else
             o.dir = 1;
         
-        
-        o.y += o.dir ? -1 : 1; /* sposto il nemico in basso o in alto a seconda della sua direzione (i nemici vanno su e giu) */
+        o.y += o.dir ? -1 : 1; /* sposto il nemico in basso o in alto di continuo per dare più movimento*/
 
         /**
          * se il nemico è fuori dallo schermo dobbiamo terminare il processo
@@ -120,7 +118,7 @@ void pEnemy2(int pipeOut, Object o){
             o.y++;
             o.dir = 0;
         }
-        if (o.x < -5){
+        if (o.x < -5){ /* Bordo laterale superato */
             loop = false;
             o.state = KILLED;
         }
@@ -144,8 +142,7 @@ void pBomb(int pipeOut, Object o){
 
     while (loop){
         o.x--;                     /* sposto la bomba verso sinistra */
-        /* o.y += o.dir ? -1 : 1; Per spostare la bomba in alto o in basso */
-        
+       
         /**
          * se il missile è fuori dallo schermo dobbiamo terminare il processo
          * perciò terminiamo il loop, comunichiamo al processo principale che il proiettile 
@@ -196,9 +193,14 @@ void pMissile(int pipeOut, Object o){
 }
 
 /**
- * @brief Questa funzione è il cuore del gioco nella versione processi, 
+ * @brief uesta funzione è il cuore del gioco nella versione processi, 
  * in essa vengono lette le informazioni prodotte dai processi,
  * gestita la logica di gioco e predisposto tutto per il disegno su schermo
+ * 
+ * @param life Contatore numero di vite
+ * @param enemiesdim Numero di nemici da mostrare
+ * @param shotProb Probabilità di lancio di una bomba da parte di un qualunque nemico
+ * @param color Colore usato nel gioco
  */
 void pEngine(int life, int enemiesdim, int shotProb, int color){
     attron(COLOR_PAIR(color));
@@ -221,7 +223,7 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
     Object *missiles = (Object *)malloc(sizeof(Object) * missilesCount);
 
     bool *doubleMissile = (bool *) malloc(sizeof(bool)* missile2Count);      /* Array per contenere il fatto che il nemico di secondo livello sia stato attaccato 2 volte */
-    doubleMissile[0] = false;   //Prima inizializzazione
+    doubleMissile[0] = false;   /* Prima inizializzazione */
 
     Object message; /* qui viene salvato il messaggio letto dalla pipe dei processi */
    
@@ -300,8 +302,6 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                          conditions = true;
                      }
                 }
-                //conditions = conditions && message.hasShot;
-                //conditions = message.hasShot;
 
                 astroship->type = message.type;
                 astroship->x = message.x;
@@ -386,7 +386,6 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                     }
                 }
                 break;
-
             }
             
             case MISSILE:{
@@ -396,7 +395,6 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                 missiles[id].x = message.x;
                 missiles[id].y = message.y;
 
-                
                 bool isMissileAlive = false;
                 if(missiles[id].state > ALIVE && message.state < ALIVE){
                     //abbiamo in entrata un missile inizializzato
@@ -455,24 +453,18 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                     /* Controlliamo se è stato colpito 2 volte */
                     int enemy2id = missileCollided(enemies2,missiles[id],enemies2Count);
 
-                    if(doubleMissile[enemy2id] == true 
-                    && enemy2id > -1 
-                    ){  /* Match nemico2 missile (colpito almeno 2 volte) */
-                        //sleep(3);
-                        //if(enemies2[enemy2id].state != DEAD){  
-                            /* Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile) */
-                            enemies2[enemy2id].y = 0;
-                            enemies2[enemy2id].x = 0;
-                            enemies2[enemy2id].state = DEAD;
-                        //}
+                    if(doubleMissile[enemy2id] == true && enemy2id > -1 ){  
+                        /* Match nemico2 missile (colpito almeno 2 volte) */
+                        /* Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile) */
+                        enemies2[enemy2id].y = 0;
+                        enemies2[enemy2id].x = 0;
+                        enemies2[enemy2id].state = DEAD;
 
                         /* Ammazzo il missile stesso */
                         missiles[id].y = -1;
                         missiles[id].x = -1;
                         missiles[id].state = DEAD;
-                        //usleep(500000);
                     }
-
                     if(doubleMissile[enemy2id] == false && enemy2id > -1 && enemies2[enemy2id].state == INITIALIZED){         
                         /*  Un nemico lv. 2 Non è mai stato colpito prima, impostiamo su true */
                         doubleMissile[enemy2id] = true;
@@ -492,7 +484,6 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                 /* Test per vedere se nella pipe è rimasto un nemico 2 per sbaglio */
                 if(!(enemies2[id].pid == -1)){ 
                     /* Dovresti essere morto, sono gli ultimi elementi rimasti nella pipe, ti ignoro */
-                
                     enemies2[id].x = message.x;
                     enemies2[id].y = message.y; 
 
@@ -530,15 +521,14 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                             astroship->y = -1;
                             astroship->x = -1;
                             astroship->state = DEAD;                                            
-
                         }   
                     }
                 }
             }
         }
         
-        
-        /* Controllo delle confizioni di giocabilità         
+        /* Controllo delle confizioni di giocabilità    
+            LEGGENDA     
          Status = -1 => si gioca ancora
          Status = 0 => 
          Status = 1 => si esce dal gioco come vincitori
@@ -555,9 +545,8 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
         if(status > 0){
             loop = false;
             clearScreen();
-            mvprintw(0,0,"STATUS %d", status);
             refresh();
-            sleep(5);
+            sleep(1);
             drawFinalScene(status);
         }
         
@@ -570,6 +559,18 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
 
 }
 
+/**
+ * @brief Funzione per la pulizia delle risorse ad ogni ciclo
+ * 
+ * @param enemies1 Nemici di primo livello
+ * @param enemies1Count Contatore nemici primo livello
+ * @param enemies2 Nemici di secondo livello
+ * @param enemies2Count Contatore nemici secondo livello
+ * @param missiles Missili
+ * @param missilesCount Contatore nemici
+ * @param bombs Bombe
+ * @param bombsCount Contatore bombe
+ */
 void pClean( 
     Object *enemies1, int enemies1Count,
     Object *enemies2, int enemies2Count,
@@ -644,6 +645,7 @@ void pEnd(
     }
     refresh();
 
+    /* Ammazzare in areaGioco ciò che è già morto */
     int i;   
     for (i = 0; i < missilesCount; i++){
         if(!kill(missiles[i].pid,SIGKILL)){
@@ -653,7 +655,6 @@ void pEnd(
         refresh();
     }
 
-    /* Ammazzare in areaGioco ciò che è già morto */
     
     for (i = 0; i < enemies1Count; i++){
         if(!kill(enemies1[i].pid,SIGKILL)){
@@ -688,7 +689,16 @@ void pEnd(
 }
 
 
-
+/**
+ * @brief Funzioni per il controllo delle condizioni di uscita o continuo del gioco
+ * 
+ * @param life Contatore vire
+ * @param enemies1 Nemici di primo livello
+ * @param enemies1Count Contatore nemici di secondo livello
+ * @param enemies2 Nemici di secondo livello
+ * @param enemies2Count Contatore nemici di secondo livello
+ * @return int Indice di ritorno della codnzioni di gioco
+ */
 int statusConditions(bool life,
     Object *enemies1, int enemies1Count,
     Object *enemies2, int enemies2Count){

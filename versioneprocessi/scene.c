@@ -339,6 +339,11 @@ void drawSplashScreen(){
     attroff(COLOR_PAIR(i));
 }
 
+/**
+ * @brief Funzione di disegno del menù di gioco
+ * 
+ * @return int Tipologia di difficoltà selezionata
+ */
 int drawMenu(){
     int choice = 0;
     bool chosen = false;
@@ -383,9 +388,19 @@ int drawMenu(){
     return choice;
 }
 
+
 /**
  * @brief Funzione per il disegno degli oggetti nella scena
  * 
+ * @param astroship Oggetto Astronave
+ * @param enemies Nemici di primo livello
+ * @param enemiesCount Contatore dei nemici di primo livello
+ * @param enemies2  Nemici di secondo livello
+ * @param enemies2Count Contatore dei nemici di secondo livello
+ * @param missiles Missili
+ * @param missilesCount Contatore nemici
+ * @param bombs Bombe
+ * @param bombsCount Contatore numero di bombe generate
  */
 void drawScene(
     Object *astroship,
@@ -455,7 +470,6 @@ void drawObject(Object entity){
             mvprintw(entity.y, entity.x, "O");
             break;
     }
-    //attroff(COLOR_PAIR(entity.color));
 }
 
 
@@ -515,6 +529,12 @@ int astroCollided(Object astroship, Object dangerousObj){
     return -1;    
 }
 
+
+/**
+ * @brief Funzione per il disegno della scena finale (schermata di vittoria o sconfitta)
+ * 
+ * @param status 
+ */
 void drawFinalScene(int  status){
     if(status == 1)
         gameWin();
@@ -528,7 +548,10 @@ void drawFinalScene(int  status){
     //Status = 3 => si esce perdenti (life == 0)
 }
 
-
+/**
+ * @brief Funzione per la generazione per la schermata di vittoria
+ * 
+ */
 void gameWin(){
     clearScreen();
     int i;
@@ -536,12 +559,13 @@ void gameWin(){
         mvprintw(i, 0, win[i]);
     refresh();
     
-    //getch();
     sleep(3);
-    //getch();
-    clearScreen();
 }
 
+/**
+ * @brief Funzione per la generazione per la schermata di sconfitta
+ * 
+ */
 void gameLose(){   
     clearScreen();
     int i;
@@ -549,11 +573,7 @@ void gameLose(){
         mvprintw(i, 0, lose[i]);
     refresh();
 
-    //getch();
-    //timeout(5000);
     sleep(3);
-    //getch();
-    clearScreen();
 }
 
 

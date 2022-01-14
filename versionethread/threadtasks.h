@@ -1,6 +1,6 @@
 #include "scene.h"
 
-#define N_MISSILES 2
+
 
 Object * astroship;
 Object * enemies1;
@@ -27,7 +27,6 @@ pthread_mutex_t tMutex;
 void* tastroship (void* parameters);
 void* tEnemy1 (void* parameters);
 void* tEnemy2(void* parameters);
-void* tBombe(void* parameters);
 void* tMissile(void* parameters);
 
 void* tBombe2(void* parameters);
@@ -39,8 +38,6 @@ int statusConditionsThread(bool life,
     Object *enemies2);
 
 void tEnd();
-
-void myInitScreen();
 
 void clearScreens();
 

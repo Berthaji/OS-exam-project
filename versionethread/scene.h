@@ -12,11 +12,9 @@
 #include <pthread.h>
 #include <ncurses.h>
 
+/* -  MACRO - */
 
-
-/* -  DEFINE - */
-
-/* Define funzionali */
+/* Macro funzionali */
 #define SCREEN_W getmaxx(stdscr)
 #define SCREEN_H getmaxy(stdscr)
 
@@ -41,7 +39,7 @@
 #define ENEMY_GENERATION_LINES 4            //Numero di linee di nemici
 
 
-/* Define interne di supporto */
+/* Macro interne di supporto */
 #define DELAY_ARRSTART 1000000
 
 #define DIM_ARRSTART_Y 37
@@ -55,6 +53,7 @@
 #define DIM_ARRMENU 4
 
 #define DIM_ARRMENU_ 14
+#define N_MISSILES 2
 
 
 /* -  VARIABILI GLOBALI - */
