@@ -17,7 +17,6 @@ void pEnd(
     Object *bombs, int bombsCount, int fs[]);   
 
 void pClean( 
-    Object *astroship,
     Object *enemies1, int enemies1Count,
     Object *enemies2, int enemies2Count,
     Object *missiles, int missilesCount,

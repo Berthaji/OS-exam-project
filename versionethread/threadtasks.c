@@ -2,6 +2,8 @@
 
 void tEngine(int lifes, int enemiesdim, int shotProb, int color){
 
+    attron(COLOR_PAIR(color));
+
     clearScreens();
     
     missilesCount =  (int*) malloc (sizeof(int)); // * 1 è ridondante
@@ -106,7 +108,7 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
     }
 
     //Per la generazione dei missili
-    for(i = 0; i < 2; i++){             //Questo 2 deve viventare una macro per tutto $$
+    for(i = 0; i < N_MISSILES; i++){             //Questo 2 deve viventare una macro per tutto $$
         pthread_mutex_lock(&tMutex); 
 
         missiles[i].type = MISSILE;
@@ -143,7 +145,7 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
 
         pthread_mutex_lock(&tMutex); 
         //GENERAZIONE BOMBE
-        int shot = 0;
+        //int shot = 0;
         if(rand()%100000 < shotProb){ //$$ oltre 30 da problemi di oggetti non cancellati
         //if(difference - msec >= 2){
             //difference = 0;
@@ -196,7 +198,7 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
 
         //Abilitazione condizioni di giocabilità (game Win o Game Over)
         pthread_mutex_lock(&tMutex); 
-        *status = statusConditionsThread(*life, enemies1,*enemies1Count,enemies2, *enemies1Count);
+        *status = statusConditionsThread(*life, enemies1,*enemies1Count,enemies2);
         //pthread_mutex_unlock(&tMutex);
         if(*status > 0){
             loops = false;
@@ -288,56 +290,55 @@ void* tMissile(void* parameters){
     while(o->state != KILLED && *status < 0){
     
         while(o->state == INITIALIZED){
-                pthread_mutex_lock(&tMutex);
+            pthread_mutex_lock(&tMutex);
 
-                //Collisione col nemico di secondo livello
-                int i;
-                for(i = 0; i < *enemies1Count; i++ ){
+            //Collisione col nemico di secondo livello
+            int i;
+            for(i = 0; i < *enemies1Count; i++ ){
 
-                    if( range(enemies2[i].x, enemies2[i].x , o->x) &&
-                        range(enemies2[i].y, enemies2[i].y +3 , o->y)       //$$ 3 e 3 sono parametri della dimensione da dare con define
-                        //&& o->state == INITIALIZED
-                        && enemies2[i].state == INITIALIZED
-                        ){
-                            //Match raggiunto
-                            //Incremento opportuno
-                            if(doubleMissile[i] == 1){
-                                doubleMissile[i] = 2;
-                            
-                            }
-                            else if(doubleMissile[i] == 0){
-                                doubleMissile[i] = 1;
-                            }   
+                if( range(enemies2[i].x, enemies2[i].x , o->x) &&
+                    range(enemies2[i].y, enemies2[i].y +3 , o->y)       //$$ 3 e 3 sono parametri della dimensione da dare con define
+                    //&& o->state == INITIALIZED
+                    && enemies2[i].state == INITIALIZED
+                    ){
+                        //Match raggiunto
+                        //Incremento opportuno
+                        if(doubleMissile[i] == 1){
+                            doubleMissile[i] = 2;
+                        
+                        }
+                        else if(doubleMissile[i] == 0){
+                            doubleMissile[i] = 1;
+                        }   
 
-                            //condizione ulteriore di uscita dal ciclo
-                            o->state = DEAD;   //altrimenti o->x = -3; 
-                            o->x = -1;
-                            o->y = -1;
-                    }
+                        //condizione ulteriore di uscita dal ciclo
+                        o->state = DEAD;   //altrimenti o->x = -3; 
+                        o->x = -1;
+                        o->y = -1;
                 }
-
-                o->x++;
-
-                o->y += (o->dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;  
-
-                //Bordo schermo
-                if (o->y < -2 || o->y > SCREEN_H + 2){
-                    o->x = -1;
-                    o->x = -1;
-                    o->state = DEAD;
-                }
-
-                if(o->x > SCREEN_W){
-                    o->x = -1;
-                    o->x = -1;
-                    o->state = DEAD;
-                }
-
-                pthread_mutex_unlock(&tMutex);
-
-                usleep(20000);   
             }
-        usleep(MISSILESLEEP);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
+
+            o->x++;
+
+            o->y += (o->dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;  
+
+            //Bordo schermo
+            if (o->y < -2 || o->y > SCREEN_H + 2){
+                o->x = -1;
+                o->x = -1;
+                o->state = DEAD;
+            }
+
+            if(o->x > SCREEN_W){
+                o->x = -1;
+                o->x = -1;
+                o->state = DEAD;
+            }
+
+            pthread_mutex_unlock(&tMutex);
+
+            usleep(MISSILESLEEP);                 // un delay per evitare che il nemico vada troppo veloce  //usleep(ENEMYSLEEP);
+        }
     }
     
     o->state = DEAD;
@@ -502,11 +503,13 @@ void* tEnemy2(void* parameters){
 
 void tEnd(){
     refresh();
-    // pthread_cancel(astroship->tid);
-    // pthread_join(astroship->tid, NULL);
+    pthread_cancel(astroship->tid);
+    pthread_join(astroship->tid, NULL);
+    
     sleep(2);   //Delay per permettere agli altri thread di chiudersi correttamente
-    //free
     free(astroship);
+    
+    //free
     free(enemies1);
     free(missiles);
     free(bombs);
@@ -661,7 +664,7 @@ void checkCollision(){
 
 int statusConditionsThread(bool life,
     Object *enemies1, int enemies1Count,
-    Object *enemies2, int enemies2Count){
+    Object *enemies2){
 
     int status = -1;
 

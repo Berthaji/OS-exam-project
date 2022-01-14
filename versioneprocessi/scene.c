@@ -197,7 +197,7 @@ char win[13][103+1] = {
 {"                Complimenti!                                                                          "},
 {"                Ora che abbiamo spazio, posso sistemare la mia collezione di teschi alieni            "},
 {"                                                                                                      "},
-{"                                      (Premi un tasto per uscire)                                     "},                                                                           
+{"                                                                                                      "},                                                                           
 {"                                                                                                      "}                                                                                                                    
 
 
@@ -219,7 +219,7 @@ char lose[14][121+1] = {
 {"                                         Nel frattempo torna a consegnare pizze, va'                                    "},
 {"                                                                                                                        "},
 {"                                                                                                                        "},
-{"                                                (Premi un tasto per uscire)                                             "},                                                                               
+{"                                                                                                                        "},                                                                               
 {"                                                                                                                        "}
 
 };
@@ -370,6 +370,10 @@ int drawMenu(){
             case ' ':
                 chosen = true;
                 break;
+
+            case 10:    //Tasto enter
+                chosen = true;
+                break;
         }
         clearScreen();
         for (y = 0; y < DIM_ARRMENU_Y; y++)
@@ -403,8 +407,8 @@ void drawScene(
         if (enemies2[i].state != DEAD && enemies2[i].state != KILLED) //$$
             drawObject(enemies2[i]);
 
-    for (i = 0; i < bombsCount; i++ && bombs[i].state != KILLED) //$$
-        if (bombs[i].state != DEAD)
+    for (i = 0; i < bombsCount; i++)
+        if (bombs[i].state != DEAD && bombs[i].state != KILLED)
             drawObject(bombs[i]);
 
     for (i = 0; i < missilesCount; i++)
@@ -532,8 +536,9 @@ void gameWin(){
         mvprintw(i, 0, win[i]);
     refresh();
     
-    //timeout(100);
-    getch();
+    //getch();
+    sleep(3);
+    //getch();
     clearScreen();
 }
 
@@ -543,9 +548,11 @@ void gameLose(){
     for(i=0; i<DIM_ARRMENU_; i++)
         mvprintw(i, 0, lose[i]);
     refresh();
-    
-    //timeout(100);
-    getch();
+
+    //getch();
+    //timeout(5000);
+    sleep(3);
+    //getch();
     clearScreen();
 }
 

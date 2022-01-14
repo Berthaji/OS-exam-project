@@ -21,7 +21,7 @@ int main(){
 
     /* Inizializzare un colore per il gioco  */
     int color = (rand()%(DIM_COLORS-1))+1;
-    attron(COLOR_PAIR(color));
+    
    
     switch (choice){
         case 0: /* Facile */

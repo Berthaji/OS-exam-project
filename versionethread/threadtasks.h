@@ -1,5 +1,6 @@
 #include "scene.h"
 
+#define N_MISSILES 2
 
 Object * astroship;
 Object * enemies1;
@@ -35,7 +36,7 @@ void drawScenes();
 
 int statusConditionsThread(bool life,
     Object *enemies1, int enemies1Count,
-    Object *enemies2, int enemies2Count);
+    Object *enemies2);
 
 void tEnd();
 

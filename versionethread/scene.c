@@ -150,7 +150,6 @@ char astroship_sprites[ASTRODCHOICE][5][6] = { //4 possibile choices
         {" ==> "},
         {"==>  "}
     }
-
 };
 
 char enemy_sprites[ENEMYDCHOICE][3][4] = {
@@ -197,7 +196,7 @@ char win[13][103+1] = {
 {"                Complimenti!                                                                          "},
 {"                Ora che abbiamo spazio, posso sistemare la mia collezione di teschi alieni            "},
 {"                                                                                                      "},
-{"                                      (Premi un tasto per uscire)                                     "},                                                                          
+{"                                                                                                      "},                                                                          
 {"                                                                                                      "}                                                                                                                    
 
 
@@ -219,7 +218,7 @@ char lose[14][121+1] = {
 {"                                         Nel frattempo torna a consegnare pizze, va'                                    "},
 {"                                                                                                                        "},
 {"                                                                                                                        "},
-{"                                                (Premi un tasto per uscire)                                             "},                                                                               
+{"                                                                                                                        "},                                                                               
 {"                                                                                                                        "}
 
 };
@@ -368,6 +367,10 @@ int drawMenu(){
                 break;
 
             case ' ':
+                chosen = true;
+                break;
+
+            case 10:    //Tasto enter
                 chosen = true;
                 break;
         }
@@ -524,7 +527,6 @@ void drawFinalScene(int  status){
     //Status = 3 => si esce perdenti (life == 0)
 }
 
-
 void gameWin(){
     clearScreen();
     int i;
@@ -532,8 +534,9 @@ void gameWin(){
         mvprintw(i, 0, win[i]);
     refresh();
     
-    //timeout(100);
-    getch();
+    //getch();
+    sleep(3);
+    //getch();
     clearScreen();
 }
 
@@ -543,9 +546,11 @@ void gameLose(){
     for(i=0; i<DIM_ARRMENU_; i++)
         mvprintw(i, 0, lose[i]);
     refresh();
-    //timeout(100);
-    getch();
+
+    //getch();
+    //timeout(5000);
+    sleep(3);
+    //getch();
     clearScreen();
 }
-
 

@@ -28,7 +28,6 @@ void pAstroship(int pipeOut, Object o){
                 break;
         
             case ' ': /* Barra spaziatrice */
-                printf("\a");
                 o.hasShot = true;
                 break;
         }
@@ -123,7 +122,7 @@ void pEnemy2(int pipeOut, Object o){
         }
         if (o.x < -5){
             loop = false;
-            o.state = DEAD;
+            o.state = KILLED;
         }
 
         write(pipeOut, &o, sizeof(o)); 
@@ -144,7 +143,7 @@ void pBomb(int pipeOut, Object o){
     bool loop = true;
 
     while (loop){
-        o.x--;                     /* sposto la bomba verso sinistra
+        o.x--;                     /* sposto la bomba verso sinistra */
         /* o.y += o.dir ? -1 : 1; Per spostare la bomba in alto o in basso */
         
         /**
@@ -173,10 +172,8 @@ void pBomb(int pipeOut, Object o){
 void pMissile(int pipeOut, Object o){
     bool loop = true;
     while (loop){
-        o.x++;                     /* sposto il missile verso sinistra
-        /* o.y += 0; o.dir ? -1 : 1; /* sposto il missile in basso o in alto a seconda della sua direzione */
-        
-
+        o.x++;                     /* sposto il missile verso sinistra */
+       
         o.y += (o.dir ? -1 : 1) * SHOT_ANGLE_CORRECTION;      
 
         /**
@@ -204,6 +201,7 @@ void pMissile(int pipeOut, Object o){
  * gestita la logica di gioco e predisposto tutto per il disegno su schermo
  */
 void pEngine(int life, int enemiesdim, int shotProb, int color){
+    attron(COLOR_PAIR(color));
 
     /* variabili di supporto */
     bool missilesShooted = false;
@@ -279,7 +277,6 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
 
             if (enemies1[i].pid == 0){
                 enemies1[i].dir = i % 2;      /* Tutti in direzioni diverse  */
-                /* enemies1[i].dir = 1;            /* Tutti nella stessa direzione */ 
                 pEnemy1(pipeOut, enemies1[i]);
             }
         }
@@ -454,17 +451,13 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                         }
                     }
 
-                    /* Controllo delle collisioni coi nemici di secondo livello
+                    /* Controllo delle collisioni coi nemici di secondo livello */
                     /* Controlliamo se è stato colpito 2 volte */
                     int enemy2id = missileCollided(enemies2,missiles[id],enemies2Count);
 
                     if(doubleMissile[enemy2id] == true 
                     && enemy2id > -1 
                     ){  /* Match nemico2 missile (colpito almeno 2 volte) */
-                        //clearScreen();
-                        // mvprintw(1,0, "COLLISIONE 2 - EN2ID: %d    ", enemy2id);
-                        // sleep(1);
-                        // refresh();
                         //sleep(3);
                         //if(enemies2[enemy2id].state != DEAD){  
                             /* Ammazzo il nemico solo se viene colpito una volta (ossia dal primo missile) */
@@ -483,10 +476,6 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                     if(doubleMissile[enemy2id] == false && enemy2id > -1 && enemies2[enemy2id].state == INITIALIZED){         
                         /*  Un nemico lv. 2 Non è mai stato colpito prima, impostiamo su true */
                         doubleMissile[enemy2id] = true;
-                        // clearScreen();
-                        // mvprintw(1,0, "COLLISIONE 1 - EN2ID: %d     ", enemy2id);
-                        // refresh();
-                        //sleep(1);
 
                         /* Ammazzo il missile stesso */
                         missiles[id].y = -1;
@@ -550,11 +539,11 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
         
         
         /* Controllo delle confizioni di giocabilità         
-        /* Status = -1 => si gioca ancora
-        /* Status = 0 => 
-        /* Status = 1 => si esce dal gioco come vincitori
-        /* Status = 2 => si esce perdenti (navicelle a sx)
-        /* Status = 3 => si esce perdenti (life == 0)*/
+         Status = -1 => si gioca ancora
+         Status = 0 => 
+         Status = 1 => si esce dal gioco come vincitori
+         Status = 2 => si esce perdenti (navicelle a sx)
+         Status = 3 => si esce perdenti (life == 0) */
 
         /* Funzioni di disegno */
         drawScene(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);
@@ -565,26 +554,23 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
         status = statusConditions(life, enemies1, enemies1Count, enemies2, enemies2Count);
         if(status > 0){
             loop = false;
+            clearScreen();
+            mvprintw(0,0,"STATUS %d", status);
+            refresh();
             sleep(5);
             drawFinalScene(status);
         }
         
         /* Liberazione eventuali risorse */
-        pClean(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);    
+        pClean(enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount);    
     }
 
     /* funzione killa robe */
     pEnd(astroship, enemies1, enemies1Count, enemies2, enemies2Count, missiles, missilesCount, bombs, bombsCount, fs);
-    
-
-    //refresh();
-    sleep(1);
-    //endwin();
 
 }
 
 void pClean( 
-    Object *astroship,
     Object *enemies1, int enemies1Count,
     Object *enemies2, int enemies2Count,
     Object *missiles, int missilesCount,
@@ -731,18 +717,18 @@ int statusConditions(bool life,
       arrivare a abordo schermo => ciclo su coordinate dei nemici (x < 0 e  0 < y > DIMSCHERMO ) */
 
     for (i = 0; i < enemies1Count; i++)
-        if (enemies1[i].x < 1 && enemies1[i].y > 0 && enemies1[i].y < SCREEN_H)
+        if (enemies1[i].x < 1 && enemies1[i].y > 0 && enemies1[i].y < SCREEN_H && enemies1[i].state==INITIALIZED)
             status = 2;
     for (i = 0; i < enemies2Count; i++)
-        if (enemies2[i].x < 1 && enemies2[i].y > 0 && enemies2[i].y < SCREEN_H)
+        if (enemies2[i].x < 1 && enemies2[i].y > 0 && enemies2[i].y < SCREEN_H && enemies2[i].state==INITIALIZED)
             status = 2; 
 
         /* LEGGENDA:
             Status = -1 => si gioca ancora
-        /*  Status = 0 => 
-        /*  Status = 1 => si esce dal gioco come vincitori
-        /*  Status = 2 => si esce perdenti (navicelle a sx)
-        /*  Status = 3 => si esce perdenti (life == 0)*/
+          Status = 0 => 
+          Status = 1 => si esce dal gioco come vincitori
+          Status = 2 => si esce perdenti (navicelle a sx)
+          Status = 3 => si esce perdenti (life == 0) */
     return status;
 }
 
