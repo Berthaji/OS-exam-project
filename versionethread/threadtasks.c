@@ -52,7 +52,7 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
     astroship = (Object*) malloc (sizeof(Object) * 1);
 
     //Allocazione spazio per i missili
-    missiles = (Object*) malloc (sizeof(Object) * 3); //Ho solo due missili
+    missiles = (Object*) malloc (sizeof(Object) * N_MISSILES); //Ho solo due missili
 
     //Allocazione spazio per gli M nemici di primo livello
     enemies1 = (Object*) malloc (sizeof(Object) * *enemies1Count);
@@ -70,7 +70,8 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
     ///Creazione dei thread per ogni elemento
     
     //Per astronave
-    pthread_create(&astroship->tid, NULL, tastroship, (void *)astroship);
+    if(pthread_create(&astroship->tid, NULL, tastroship, (void *)astroship))
+        exit(0);
 
     //Per nemici liv. 1    
     int i;
@@ -82,7 +83,7 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         enemies1[i].y = ENEMY_GENERATION_DISTANCE_LINES * y;
         enemies1[i].type = ENEMY1;
         enemies1[i].state = INITIALIZED;   
-        enemies1[i].appearance = 2;   
+        enemies1[i].appearance = rand()% (ENEMYDCHOICE -1);  /* L'ultimo aspetto è riservato ai nemici di secondo livello */   
         enemies1[i].dir = i % 2;      
 
         if (i % ENEMY_GENERATION_LINES == ENEMY_GENERATION_LINES -1 && i != 0){     /* Impostiamo 4 file di nemici */
@@ -90,7 +91,10 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
                 x++;
         }
         y++;
-        pthread_create(&enemies1[i].tid, NULL, tEnemy1, (void*)(&enemies1[i])); 
+         
+        if(pthread_create(&enemies1[i].tid, NULL, tEnemy1, (void*)(&enemies1[i])))
+            exit(0);
+
         pthread_mutex_unlock(&tMutex);
     }
 
@@ -105,7 +109,10 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         enemies2[i].appearance = 3;    
         //enemies2[i].dir = i % 2;      
         doubleMissile[i] = 0;           //Contatore per il doppio colpo
-        pthread_create(&enemies2[i].tid, NULL, tEnemy2, (void*)(&enemies2[i])); 
+         
+        if(pthread_create(&enemies2[i].tid, NULL, tEnemy2, (void*)(&enemies2[i])))
+            exit(0);
+
         pthread_mutex_unlock(&tMutex);
     }
 
@@ -118,7 +125,9 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         bombs[i].type = BOMB;
         bombs[i].x = -1;
         bombs[i].x = -1;  
-        pthread_create(&(bombs[i].tid), NULL, tBombe2, (void*)(&bombs[i]));
+        
+        if(pthread_create(&(bombs[i].tid), NULL, tBombe2, (void*)(&bombs[i])))
+            exit(0);
             
         pthread_mutex_unlock(&tMutex);   
     }
@@ -133,8 +142,9 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         missiles[i].y = -1;
         missiles[i].dir = i % 2;//% additional;//2;
         
+        if(pthread_create(&(missiles[i].tid), NULL, tMissile, (void*)(&missiles[i])))
+            exit(0);
 
-        pthread_create(&(missiles[i].tid), NULL, tMissile, (void*)(&missiles[i]));
         pthread_mutex_unlock(&tMutex);   
     }
 
@@ -183,17 +193,14 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
                     bombs[*bombsCount].id = *bombsCount; //
                     bombs[*bombsCount].state = INITIALIZED;
                 }
-                else{       //Entrambi morti aa quell'indice -> Nulla da fare in particolare
-                }
-
+                //else{}       Entrambi morti a quell'indice -> Nulla da fare in particolare in questo caso
                 
-                //Comandi sempre importanti
+                //Incremento all'elemento-esimo successivo
                 *bombsCount += 1;
                 
-                if(*bombsCount >= *enemies1Count){
+                if(*bombsCount >= *enemies1Count)
                     *bombsCount = 0;
-                    //bombs[*bombsCount].hasShot = true;
-                }
+                
             }
         }
         pthread_mutex_unlock(&tMutex);
@@ -201,7 +208,6 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
         //Abilitazione condizioni di giocabilità (game Win o Game Over)
         pthread_mutex_lock(&tMutex); 
         *status = statusConditionsThread(*life, enemies1,*enemies1Count,enemies2);
-        //pthread_mutex_unlock(&tMutex);
         if(*status > 0){
             loops = false;
             clearScreen();
@@ -210,7 +216,6 @@ void tEngine(int lifes, int enemiesdim, int shotProb, int color){
             drawFinalScene(*status);
         }
         pthread_mutex_unlock(&tMutex);
-
     }
     /* Terminazione delle risorse */
     tEnd();
@@ -241,23 +246,18 @@ void* tastroship (void* parameters){
 
     while (*status < 0){    //Se si chiude il resto del gioco, ha senso che anche il thread astronave si chiuda 
         c = getch();
-        //mvprintw(6,6,"okchar"); //si ferma qui -> da risolvere
-        //$$ da rivedere la posizione del mutex, magari prima degli if
         switch (c){
             case KEY_UP:
                 pthread_mutex_lock(&tMutex);
-                if (obj->y > 0){
+                if (obj->y > 0)
                     obj->y -= 1;
-                }
                 pthread_mutex_unlock(&tMutex);
-                //obj->y++; funziona
                 break;
 
             case KEY_DOWN:
                 pthread_mutex_lock(&tMutex);
-                if (obj->y < SCREEN_H - 5){
+                if (obj->y < SCREEN_H - 5)
                     obj->y++;
-                }
                 pthread_mutex_unlock(&tMutex);
                 break;
 
@@ -269,12 +269,12 @@ void* tastroship (void* parameters){
                     && missiles[1].state != INITIALIZED //oppure dead or killed
                 ){
                     //Sono "morti": li reinizializziamo
-                    missiles[0].x =  astroship->x + 5;//message.x + 5; 
-                    missiles[0].y = astroship->y + 2;//message.y + 2;
+                    missiles[0].x =  astroship->x + 5; //+5 perchè dista 5 caratteri dalla coordinata inziale dello sprite
+                    missiles[0].y = astroship->y + 2; //+2 perchè vogliamo che appaiano davanti alla astronave
                     missiles[0].state = INITIALIZED;
 
-                    missiles[1].x =  astroship->x + 5;//message.x + 5; 
-                    missiles[1].y = astroship->y + 2;//message.y + 2;
+                    missiles[1].x =  astroship->x + 5; //+5 perchè dista 5 caratteri dalla coordinata inziale dello sprite
+                    missiles[1].y = astroship->y + 2;   //+2 perchè vogliamo che appaiano davanti alla astronave
                     missiles[1].state = INITIALIZED;
                 }
                 
@@ -302,25 +302,22 @@ void* tMissile(void* parameters){
             //Collisione col nemico di secondo livello
             int i;
             for(i = 0; i < *enemies1Count; i++ ){
-
                 if( range(enemies2[i].x, enemies2[i].x , o->x) &&
-                    range(enemies2[i].y, enemies2[i].y +3 , o->y)       //$$ 3 e 3 sono parametri della dimensione da dare con define
-                    //&& o->state == INITIALIZED
-                    && enemies2[i].state == INITIALIZED
-                    ){
-                        //Match raggiunto
-                        //Incremento opportuno
-                        if(doubleMissile[i] == 1){
-                            doubleMissile[i] = 2;
-                        }
-                        else if(doubleMissile[i] == 0){
-                            doubleMissile[i] = 1;
-                        }   
+                    range(enemies2[i].y, enemies2[i].y + ENEMYDIM , o->y)      
+                    && enemies2[i].state == INITIALIZED){
+                    //Match raggiunto
+                    //Incremento opportuno
+                    if(doubleMissile[i] == 1){
+                        doubleMissile[i] = 2;
+                    }
+                    else if(doubleMissile[i] == 0){
+                        doubleMissile[i] = 1;
+                    }   
 
-                        //condizione ulteriore di uscita dal ciclo
-                        o->state = DEAD;
-                        o->x = -1;
-                        o->y = -1;
+                    //condizione ulteriore di uscita dal ciclo
+                    o->state = DEAD;
+                    o->x = -1;
+                    o->y = -1;
                 }
             }
 
@@ -517,13 +514,12 @@ void drawScenes(){
                 drawObject(bombs[i]);
     }
 
-    for (i = 0; i < 2; i++)         //$$ il 2 deve diventare una macro
-        if (missiles[i].state == INITIALIZED)//!= DEAD && missiles[i].state != KILLED)
+    for (i = 0; i < N_MISSILES; i++)        
+        if (missiles[i].state == INITIALIZED)
             drawObject(missiles[i]);
 
     //Contatore vite
     mvprintw(0,0, "VITE: %d ", *life);
-
     refresh();
 }
 
@@ -625,10 +621,10 @@ int statusConditionsThread(bool life,
     int status = -1;
 
     //1. nelle condizioni, se l'array dei nemici hanno tutti pid = -1, allora imposta >> status = 1 (e loop = false)
-    bool enemiesDead = false;//true;           
+    bool enemiesDead = false;        
     int i;
     for (i = 0; i < enemies1Count; i++)
-        if (enemies1[i].state == INITIALIZED) //nuova condizione da aggiungere //!(enemies1[i].state == DEAD )
+        if (enemies1[i].state == INITIALIZED)
             enemiesDead = true;
 
     for (i = 0; i < enemies1Count; i++)
@@ -647,7 +643,7 @@ int statusConditionsThread(bool life,
     // arrivare a abordo schermo => ciclo su coordinate dei nemici (x < 0 e  0 < y > DIMSCHERMO )
     for (i = 0; i < enemies1Count; i++)
         if (enemies1[i].x < 1 && enemies1[i].y > 0 && enemies1[i].y < SCREEN_H)
-            status = 2;//status = i + 100;
+            status = 2;
     for (i = 0; i < enemies1Count; i++)
         if (enemies2[i].x < 1 && enemies2[i].y > 0 && enemies2[i].y < SCREEN_H)
             status = 2; 

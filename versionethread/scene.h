@@ -98,8 +98,8 @@ char arrStart [DIM_ARRSTART_Y][DIM_ARRSTART_X];
 char arrMenu[DIM_ARRMENU][DIM_ARRMENU_Y][DIM_ARRMENU_X];
 char astroship_sprites[ASTRODCHOICE][5][6];
 char enemy_sprites[ENEMYDCHOICE][3][4];
-char win[13][103+1];
-char lose[14][121+1];
+char win[DIM_ARRMENU_][103+1];
+char lose[DIM_ARRMENU_][121+1];
 
 
 

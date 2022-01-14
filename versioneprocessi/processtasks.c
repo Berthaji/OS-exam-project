@@ -257,6 +257,9 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
         pAstroship(fs[1], *astroship);
     }
     else{   /* Siamo ancora nel processo padre */
+        if (astroship->pid == -1){
+            exit(0);
+        }
         /* Generazione dei nemici di primo livello */
         int enemyappereace = rand()% (ENEMYDCHOICE -1);  /* L'ultimo aspetto è riservato ai nemici di secondo livello */
         int i,x,y;
@@ -281,6 +284,9 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                 enemies1[i].dir = i % 2;      /* Tutti in direzioni diverse  */
                 pEnemy1(pipeOut, enemies1[i]);
             }
+            if (enemies1[i].pid == -1)
+                exit(0);
+        
         }
     }
     
@@ -324,6 +330,8 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                             missiles[i].dir = i % 2;
                             pMissile(pipeOut, missiles[i]);
                         }
+                        if (missiles[i].pid == -1)
+                            exit(0);
                     }
                 }
                 break;
@@ -350,6 +358,8 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                                 bombs[i].dir = i % 2;
                                 pBomb(pipeOut, bombs[i]);
                             }
+                            if (bombs[i].pid == -1)
+                                exit(0);
                         }
                     }
                     
@@ -440,6 +450,8 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                                     enemies2[i].dir = 0;
                                     pEnemy2(pipeOut, enemies2[i]);
                                 }
+                                if (enemies2[i].pid == -1)
+                                    exit(0);
                             }
                                                     
                             /* Ammazzo il nemico colpito */
@@ -503,6 +515,9 @@ void pEngine(int life, int enemiesdim, int shotProb, int color){
                                 bombs[i].dir = i % 2;
                                 pBomb(pipeOut, bombs[i]);
                             }
+                            if (bombs[i].pid == -1)
+                                exit(0);
+                            
                         }
                     }
 

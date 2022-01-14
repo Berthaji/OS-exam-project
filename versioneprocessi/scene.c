@@ -183,7 +183,7 @@ char enemy_sprites[ENEMYDCHOICE][3][4] = {
 
 
 //Schermate di vittoria e sconfitta
-char win[13][103+1] = {
+char win[DIM_ARRMENU_][103+1] = {
 
                                                                                                                   
 {"oooooo     oooo ooooo ooooooooooooo ooooooooooooo   .oooooo.   ooooooooo.   ooooo       .o.       .o. "},
@@ -204,7 +204,7 @@ char win[13][103+1] = {
 };
 
 
-char lose[14][121+1] = {
+char lose[DIM_ARRMENU_][121+1] = {
 
 
 {" .oooooo..o   .oooooo.     .oooooo.   ooooo      ooo oooooooooooo ooooo ooooooooooooo ooooooooooooo       .o.       .o. "},
